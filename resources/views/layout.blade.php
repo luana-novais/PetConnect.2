@@ -1,74 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetConnect</title>
-    
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <script src="https://cdn.tailwindcss.com"></script>
-    @endif
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navbar</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-900 h-screen overflow-hidden flex">
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#">Brand</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Alternar navegação">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="dropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Principal
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="dropdown1">
+    <li><a class="dropdown-item" href="#">Início</a></li>
+<li><a class="dropdown-item" href="#">Agenda</a></li>
+<li><a class="dropdown-item" href="#">Buscar sitters</a></li>
+<li><a class="dropdown-item" href="#">Mensagens</a></li>
+  </ul>
+</li>
 
-    <!-- Navbar Lateral (Sidebar) -->
-    <nav class="w-64 bg-slate-900 border-r border-gray-200 text-white flex flex-col justify-between h-full">
-        <div>
-            <!-- Logo ou Título -->
-            <div class="h-16 flex items-center justify-center border-b border-gray-700">
-                <span class="text-2xl font-bold">PetConnect</span>
-            </div>
-            
-            <!-- Links do Menu -->
-            <ul class="flex flex-col mt-4 space-y-1 px-4">
-                <li>
-                    <a href="#" class="block px-4 py-2 hover:bg-slate-800 rounded-md transition-colors">
-                        Início
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="block px-4 py-2 hover:bg-slate-800 rounded-md transition-colors">
-                        Meus Pets
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="block px-4 py-2 hover:bg-slate-800 rounded-md transition-colors">
-                        Mensagens
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="block px-4 py-2 hover:bg-slate-800 rounded-md transition-colors">
-                        Configurações
-                    </a>
-                </li>
-            </ul>
-        </div>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="dropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Meus Pets
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="dropdown2">
+    <li><a class="dropdown-item" href="#">nome</a></li>
+  </ul>
+</li>
 
-        <!-- Parte inferior da sidebar -->
-        <div class="p-4 border-t border-gray-700">
-            <a href="#" class="block px-4 py-2 text-center bg-red-600 hover:bg-red-700 rounded-md transition-colors">
-                Sair
-            </a>
-        </div>
-    </nav>
-
-    <!-- Área de Conteúdo Principal -->
-    <main class="flex-1 overflow-y-auto w-full">
-        <!-- Um cabeçalho opcional da página -->
-        <header class="bg-white shadow h-16 flex items-center px-6">
-            <!-- Título dinâmico da página -->
-            <h1 class="text-xl font-semibold text-gray-800">
-                @yield('title', 'Página Atual')
-            </h1>
-        </header>
-
-        <!-- Aqui o conteúdo das outras páginas é inserido -->
-        <div class="p-6">
-            @yield('content')
-        </div>
-    </main>
-
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="dropdown3" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Conta
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="dropdown3">
+    <li><a class="dropdown-item" href="#">Avaliações</a></li>
+<li><a class="dropdown-item" href="#">Configurações</a></li>
+  </ul>
+</li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container py-3">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 </html>
