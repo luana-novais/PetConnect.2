@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
 
     /**
@@ -45,5 +46,50 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function identificacao()
+    {
+        return $this->hasOne(Identificacao::class, 'id_user');
+    }
+ 
+    public function pets()
+    {
+        return $this->hasMany(Pet::class, 'id_user');
+    }
+ 
+    public function enderecos()
+    {
+        return $this->hasMany(Endereco::class, 'id_user');
+    }
+ 
+    public function telefones()
+    {
+        return $this->hasMany(Telefone::class, 'id_user');
+    }
+ 
+    public function disponibilidades()
+    {
+        return $this->hasMany(Disponibilidade::class, 'id_user');
+    }
+ 
+    public function fotosUsuarios()
+    {
+        return $this->hasMany(FotoUsuario::class, 'id_user');
+    }
+ 
+    public function agendamentosComoCliente()
+    {
+        return $this->hasMany(Agendamento::class, 'id_user_cliente');
+    }
+ 
+    public function agendamentosComoSitter()
+    {
+        return $this->hasMany(Agendamento::class, 'id_user_sitter');
+    }
+ 
+    public function avaliacoes()
+    {
+        return $this->hasMany(Avaliacao::class, 'id_user');
     }
 }
