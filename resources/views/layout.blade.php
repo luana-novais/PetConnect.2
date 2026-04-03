@@ -36,7 +36,7 @@
                 <i class="bi bi-heart"></i>
                 <span class="nav-text">Pets</span>
             </a>
-            <a href="#" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+            <a href="" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
                 <i class="bi bi-calendar3"></i>
                 <span class="nav-text">Agendamentos</span>
             </a>

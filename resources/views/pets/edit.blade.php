@@ -1,5 +1,4 @@
 @extends('layout')
-@extends('layout')
 
 @section('title', 'Editar Pet')
 @section('page-title', 'Editar Pet')
@@ -137,29 +136,3 @@
 </div>
 
 @endsection
-
-@push('scripts')
-<script>
-    const selectEspecie  = document.getElementById('id_especie');
-    const selectRaca     = document.getElementById('id_raca');
-    const todasRacas     = @json($racas);
-    const racaAtualId    = @json($pet->id_raca ?? null);
-
-    selectEspecie.addEventListener('change', function () {
-        const especieId = parseInt(this.value);
-        selectRaca.innerHTML = '<option value="">Selecione a raça...</option>';
-
-        if (!especieId) return;
-
-        const filtradas = todasRacas.filter(r => r.id_especie === especieId);
-
-        filtradas.forEach(raca => {
-            const opt = document.createElement('option');
-            opt.value = raca.id;
-            opt.textContent = raca.nome;
-            if (raca.id === racaAtualId) opt.selected = true;
-            selectRaca.appendChild(opt);
-        });
-    });
-</script>
-@endpush
