@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('app')
 
 @section('title', 'Novo Pet')
 @section('page-title', 'Novo Pet')
@@ -69,22 +69,7 @@
                             @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="id_user" class="form-label">Dono <span class="text-danger">*</span></label>
-                            <select id="id_user" name="id_user"
-                                    class="form-select @error('id_user') is-invalid @enderror" required>
-                                <option value="">Selecione o dono...</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('id_user') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('id_user')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
+                        
                         <div class="col-md-6">
                             <label for="data_nascimento" class="form-label">Data de Nascimento</label>
                             <input type="date"

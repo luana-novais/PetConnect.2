@@ -10,7 +10,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <!-- CSS Global PetConnect -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('app.css') }}" rel="stylesheet">
 
     {{-- CSS específico de cada página --}}
     @stack('styles')
@@ -67,14 +67,8 @@
                     <div style="font-size:0.72rem;color:#78716C;">
                         {{ auth()->user()->role ?? 'CLI' }}
                     </div>
-                </div>
-                <a href="{{ route('logout') }}"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                   class="ms-auto text-decoration-none" style="color:#78716C;" title="Sair">
-                    <i class="bi bi-box-arrow-right"></i>
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-            </div>
+                
+        </div>
         </div>
     </aside>
 
