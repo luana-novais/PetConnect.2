@@ -36,7 +36,7 @@
                 <i class="bi bi-heart"></i>
                 <span class="nav-text">Pets</span>
             </a>
-            <a href="" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+            <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
                 <i class="bi bi-calendar3"></i>
                 <span class="nav-text">Agendamentos</span>
             </a>
@@ -50,7 +50,7 @@
             </a>
 
             <div class="sidebar-label mt-2">Cadastros</div>
-            <a href="#" class="nav-link">
+            <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Usuários
             </a>
             <a href="#" class="nav-link">

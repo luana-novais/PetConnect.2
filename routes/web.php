@@ -10,4 +10,5 @@ use Illuminate\Http\Request;
 Route::resource('/pets',PetController::class);
 Route::resource('/agendamentos',AgendamentoController::class);
 Route::resource('/servicos',ServicoController::class);
-// Route::resource('/users',UserController::class);
+Route::resource('/users',UserController::class);
+Route::resource('/users.show',UserController::class);

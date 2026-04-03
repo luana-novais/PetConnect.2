@@ -58,14 +58,14 @@ class User extends Authenticatable
         return $this->hasMany(Pet::class, 'id_user');
     }
  
-    public function enderecos()
+    public function telefone()
     {
-        return $this->hasMany(Endereco::class, 'id_user');
+        return $this->hasOne(Telefone::class, 'id_user');
     }
- 
-    public function telefones()
+
+    public function endereco()
     {
-        return $this->hasMany(Telefone::class, 'id_user');
+        return $this->hasOne(Endereco::class, 'id_user');
     }
  
     public function disponibilidades()
