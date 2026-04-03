@@ -1,4 +1,4 @@
-@extends('app')
+@extends('layout')
 
 @section('title', 'Novo Pet')
 @section('page-title', 'Novo Pet')
@@ -65,6 +65,22 @@
                                    placeholder="Ex: Rex, Mia, Bob..."
                                    required>
                             @error('nome')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="id_user" class="form-label">Dono do Pet <span class="text-danger">*</span></label>
+                            <select id="id_user" name="id_user"
+                                    class="form-select @error('id_user') is-invalid @enderror" required>
+                                <option value="">Selecione o dono...</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ old('id_user') == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('id_user')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -144,16 +160,12 @@
                             <label for="id_raca" class="form-label">Raça <span class="text-danger">*</span></label>
                             <select id="id_raca" name="id_raca"
                                     class="form-select @error('id_raca') is-invalid @enderror" required>
-                                <option value="">Primeiro selecione a espécie...</option>
-                                @if(old('id_especie'))
-                                    @foreach($racas as $raca)
-                                        @if($raca->id_especie == old('id_especie'))
-                                            <option value="{{ $raca->id }}" {{ old('id_raca') == $raca->id ? 'selected' : '' }}>
-                                                {{ $raca->nome }}
-                                            </option>
-                                        @endif
-                                    @endforeach
-                                @endif
+                                <option value="">Selecione a raça...</option>
+                                @foreach($racas as $raca)
+                                    <option value="{{ $raca->id }}" {{ old('id_raca') == $raca->id ? 'selected' : '' }}>
+                                        {{ $raca->nome }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('id_raca')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -195,35 +207,3 @@
 </div>
 
 @endsection
-
-@push('scripts')
-<script>
-    // Carrega raças dinamicamente ao selecionar espécie
-    const selectEspecie = document.getElementById('id_especie');
-    const selectRaca    = document.getElementById('id_raca');
-
-    // Todas as raças passadas pelo controller
-    const todasRacas = @json($racas);
-
-    selectEspecie.addEventListener('change', function () {
-        const especieId = parseInt(this.value);
-        selectRaca.innerHTML = '<option value="">Selecione a raça...</option>';
-
-        if (!especieId) return;
-
-        const filtradas = todasRacas.filter(r => r.id_especie === especieId);
-
-        if (filtradas.length === 0) {
-            selectRaca.innerHTML = '<option value="">Nenhuma raça cadastrada</option>';
-            return;
-        }
-
-        filtradas.forEach(raca => {
-            const opt = document.createElement('option');
-            opt.value = raca.id;
-            opt.textContent = raca.nome;
-            selectRaca.appendChild(opt);
-        });
-    });
-</script>
-@endpush

@@ -5,6 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\User;
+use App\Models\Pet;
+use App\Models\Servico;
+use App\Models\Pagamento;
+use App\Models\Avaliacao;
+use App\Models\HistoricoServico;
+
 class Agendamento extends Model
 {
     use HasFactory;
@@ -16,19 +23,24 @@ class Agendamento extends Model
         'id_pet',
         'id_user_sitter',
         'id_servico',
-        'data_agendamento',
-        'hora_inicio',
-        'hora_fim',
+        'data_inicio',
+        'data_fim',
         'status',
         'observacoes',
     ];
 
     protected $casts = [
-        'data_agendamento' => 'date',
+        'data_inicio' => 'datetime:Y-m-d H:i',
+        'data_fim' => 'datetime:Y-m-d H:i',
         'status' => 'string',
     ];
 
-    // Relacionamentos
+    const STATUS_PENDENTE = 'pendente';
+    const STATUS_CONFIRMADO = 'confirmado';
+    const STATUS_CANCELADO = 'cancelado';
+    const STATUS_CONCLUIDO = 'concluido';
+
+    // RELACIONAMENTOS
 
     public function cliente()
     {
