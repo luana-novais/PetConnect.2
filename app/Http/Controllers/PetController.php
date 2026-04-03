@@ -8,6 +8,8 @@ use App\Models\Raca;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PetController extends Controller
 {
@@ -17,26 +19,8 @@ class PetController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Pet::with(['especie', 'raca', 'user']);
-
-        // Filtro por nome
-        if ($request->filled('nome')) {
-            $query->where('nome', 'like', '%' . $request->nome . '%');
-        }
-
-        // Filtro por espécie
-        if ($request->filled('id_especie')) {
-            $query->where('id_especie', $request->id_especie);
-        }
-
-        // Filtro por sexo
-        if ($request->filled('sexo')) {
-            $query->where('sexo', $request->sexo);
-        }
-
-        $pets    = $query->orderBy('nome')->paginate(15)->withQueryString();
-        $especies = Especie::orderBy('tipo_pet')->get();
-
+        $pets = Pet::paginate(10);
+        $especies = Especie::all();
         return view('pets.index', compact('pets', 'especies'));
     }
 
@@ -46,11 +30,10 @@ class PetController extends Controller
      */
     public function create()
     {
-        $users   = User::orderBy('name')->get();
-        $especies = Especie::orderBy('tipo_pet')->get();
-        $racas   = Raca::orderBy('nome')->get();
-
-        return view('pets.create', compact('users', 'especies', 'racas'));
+        $racas = Raca::all();
+        $especies = Especie::all();
+        $users = User::all();
+        return view('pets.create', compact('racas', 'especies', 'users'));
     }
 
     /**
@@ -59,35 +42,13 @@ class PetController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nome'            => 'required|string|max:100',
-            'id_user'         => 'required|exists:users,id',
-            'id_especie'      => 'required|exists:especies,id',
-            'id_raca'         => 'required|exists:racas,id',
-            'data_nascimento' => 'nullable|date|before_or_equal:today',
-            'sexo'            => 'required|in:MACHO,FEMEA',
-            'peso'            => 'nullable|numeric|min:0|max:999.99',
-            'observacoes'     => 'nullable|string|max:1000',
-        ], [
-            'nome.required'       => 'O nome do pet é obrigatório.',
-            'nome.max'            => 'O nome não pode ter mais de 100 caracteres.',
-            'id_user.required'    => 'Selecione o dono do pet.',
-            'id_user.exists'      => 'O dono selecionado não existe.',
-            'id_especie.required' => 'Selecione a espécie do pet.',
-            'id_especie.exists'   => 'A espécie selecionada não existe.',
-            'id_raca.required'    => 'Selecione a raça do pet.',
-            'id_raca.exists'      => 'A raça selecionada não existe.',
-            'data_nascimento.date'             => 'Data de nascimento inválida.',
-            'data_nascimento.before_or_equal'  => 'A data de nascimento não pode ser no futuro.',
-            'sexo.required'       => 'Selecione o sexo do pet.',
-            'sexo.in'             => 'Sexo inválido.',
-            'peso.numeric'        => 'O peso deve ser um número.',
-            'peso.min'            => 'O peso não pode ser negativo.',
-            'peso.max'            => 'O peso não pode ultrapassar 999,99 kg.',
-            'observacoes.max'     => 'As observações não podem ter mais de 1000 caracteres.',
-        ]);
-
-        Pet::create($validated);
+        try{
+            Pet::create($request->all());
+        }catch(Exception $e){
+            Log::error('Erro ao inserir o pet: '. $e->getMessage(),
+            [ 'stack' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Erro ao cadastrar o pet.');
+        }
 
         return redirect()
             ->route('pets.index')
@@ -98,73 +59,39 @@ class PetController extends Controller
      * Exibe os detalhes de um pet específico.
      * Rota: GET /pets/{pet}
      */
-    public function show(Pet $pet)
+    public function show($id)
     {
-        $pet->load([
-            'especie',
-            'raca',
-            'user',
-            'fotos',
-            'agendamentos.servico',
-            'agendamentos.sitter',
-        ]);
+        $pet = Pet::findOrFail($id);
+        return view('pets.show',compact('pet'));
 
-        return view('pets.show', compact('pet'));
     }
 
     /**
-     * Exibe o formulário de edição de pet.
-     * Rota: GET /pets/{pet}/edit
+     * Exibe o formulário de edição de pet ou processa a atualização.
+     * Rota: GET/POST /pets/{id}/edit
      */
-    public function edit(Pet $pet)
+    public function edit($id)
     {
-        $users   = User::orderBy('name')->get();
-        $especies = Especie::orderBy('tipo_pet')->get();
-        $racas   = Raca::orderBy('nome')->get();
+        $pet = Pet::findOrFail($id);
+        $users = User::all();
+        $especie = Especie::all();
+        $racas = Raca::all();
 
-        return view('pets.edit', compact('pet', 'users', 'especies', 'racas'));
+        return view('pets.edit', compact('pet', 'users', 'especie', 'racas'));
     }
 
-    /**
-     * Atualiza os dados de um pet no banco.
-     * Rota: PUT /pets/{pet}
-     */
-    public function update(Request $request, Pet $pet)
-    {
-        $validated = $request->validate([
-            'nome'            => 'required|string|max:100',
-            'id_user'         => 'required|exists:users,id',
-            'id_especie'      => 'required|exists:especies,id',
-            'id_raca'         => 'required|exists:racas,id',
-            'data_nascimento' => 'nullable|date|before_or_equal:today',
-            'sexo'            => 'required|in:MACHO,FEMEA',
-            'peso'            => 'nullable|numeric|min:0|max:999.99',
-            'observacoes'     => 'nullable|string|max:1000',
-        ], [
-            'nome.required'       => 'O nome do pet é obrigatório.',
-            'nome.max'            => 'O nome não pode ter mais de 100 caracteres.',
-            'id_user.required'    => 'Selecione o dono do pet.',
-            'id_user.exists'      => 'O dono selecionado não existe.',
-            'id_especie.required' => 'Selecione a espécie do pet.',
-            'id_especie.exists'   => 'A espécie selecionada não existe.',
-            'id_raca.required'    => 'Selecione a raça do pet.',
-            'id_raca.exists'      => 'A raça selecionada não existe.',
-            'data_nascimento.date'             => 'Data de nascimento inválida.',
-            'data_nascimento.before_or_equal'  => 'A data de nascimento não pode ser no futuro.',
-            'sexo.required'       => 'Selecione o sexo do pet.',
-            'sexo.in'             => 'Sexo inválido.',
-            'peso.numeric'        => 'O peso deve ser um número.',
-            'peso.min'            => 'O peso não pode ser negativo.',
-            'peso.max'            => 'O peso não pode ultrapassar 999,99 kg.',
-            'observacoes.max'     => 'As observações não podem ter mais de 1000 caracteres.',
-        ]);
-
-        $pet->update($validated);
-
-        return redirect()
-            ->route('pets.show', $pet->id)
-            ->with('success', 'Pet atualizado com sucesso!');
-    }
+    public function update(Request $request, $id)
+        {
+            try{
+                $pet = Pet::findOrFail($id);
+                $pet->update($request->all());
+            } catch(Exception $e){
+                Log::error('Erro ao alterar o cadastro: '. $e->getMessage(), [
+                    'stack' => $e->getTraceAsString()
+                ]);
+            }
+            return redirect()->route('pets.index');
+        }
 
     /**
      * Remove um pet do banco de dados.
