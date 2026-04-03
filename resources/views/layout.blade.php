@@ -12,13 +12,13 @@
     <!-- CSS Global PetConnect -->
     <link href="{{ asset('app.css') }}" rel="stylesheet">
 
-    {{-- CSS específico de cada página --}}
     @stack('styles')
 </head>
 <body>
 
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
+
         <div class="sidebar-brand d-flex align-items-center gap-2">
             <span class="logo-icon">🐾</span>
             <span class="logo-text">Pet<em>Connect</em></span>
@@ -27,76 +27,91 @@
         <nav class="sidebar-nav">
             <div class="sidebar-label">Principal</div>
             <a href="#" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2"></i> Dashboard
+                <i class="bi bi-grid-1x2"></i>
+                <span class="nav-text">Dashboard</span>
             </a>
 
             <div class="sidebar-label mt-2">Gestão</div>
             <a href="{{ route('pets.index') }}" class="nav-link {{ request()->is('pets*') ? 'active' : '' }}">
-                <i class="bi bi-heart"></i> Pets
+                <i class="bi bi-heart"></i>
+                <span class="nav-text">Pets</span>
             </a>
             <a href="#" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
-                <i class="bi bi-calendar3"></i> Agendamentos
+                <i class="bi bi-calendar3"></i>
+                <span class="nav-text">Agendamentos</span>
             </a>
             <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
-                <i class="bi bi-scissors"></i> Serviços
+                <i class="bi bi-scissors"></i>
+                <span class="nav-text">Serviços</span>
             </a>
             <a href="#" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
-                <i class="bi bi-credit-card"></i> Pagamentos
+                <i class="bi bi-credit-card"></i>
+                <span class="nav-text">Pagamentos</span>
             </a>
 
             <div class="sidebar-label mt-2">Cadastros</div>
-            <a href="users/edit" class="nav-link">
+            <a href="#" class="nav-link">
                 <i class="bi bi-people"></i> Usuários
             </a>
             <a href="#" class="nav-link">
-                <i class="bi bi-tag"></i> Espécies & Raças
+                <i class="bi bi-tag"></i>
+                <span class="nav-text">Espécies & Raças</span>
             </a>
         </nav>
 
-        <!-- User info no rodapé -->
-        <div class="p-3 border-top" style="border-color: rgba(255,255,255,0.08) !important;">
+        <!-- Rodapé do usuário -->
+        <div class="sidebar-footer">
             <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-orange-500 d-flex align-items-center justify-content-center"
-                     style="width:34px;height:34px;background:var(--pet-primary);font-size:0.85rem;color:#fff;font-weight:600;flex-shrink:0;">
+                <div class="sidebar-user-avatar flex-shrink-0">
                     {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                 </div>
-                <div style="overflow:hidden;">
+                <div class="nav-text" style="overflow:hidden;">
                     <div class="text-white fw-semibold" style="font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         {{ auth()->user()->name ?? 'Usuário' }}
                     </div>
                     <div style="font-size:0.72rem;color:#78716C;">
                         {{ auth()->user()->role ?? 'CLI' }}
                     </div>
-                
+                </div>
+            </div>
         </div>
-        </div>
+
     </aside>
 
     <!-- Main -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="mainWrapper">
+
         <!-- Topbar -->
         <div class="topbar">
-            <div>
-                <h6 class="page-title">@yield('page-title', 'Painel')</h6>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#" class="text-decoration-none" style="color:var(--pet-primary)">Home</a></li>
-                        @yield('breadcrumb')
-                    </ol>
-                </nav>
+            <div class="d-flex align-items-center gap-3">
+                <!-- Botão de recolher -->
+                <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle" title="Recolher menu">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div>
+                    <h6 class="page-title">@yield('page-title', 'Painel')</h6>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="#" class="text-decoration-none" style="color:var(--pet-primary)">Home</a>
+                            </li>
+                            @yield('breadcrumb')
+                        </ol>
+                    </nav>
+                </div>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <a href="#" class="text-secondary position-relative">
                     <i class="bi bi-bell fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;">3</span>
                 </a>
+                
             </div>
         </div>
 
         <!-- Content -->
         <div class="content-area">
 
-            {{-- Mensagens de sessão --}}
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
                     <i class="bi bi-check-circle-fill"></i>
@@ -119,6 +134,25 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const sidebar     = document.getElementById('sidebar');
+        const mainWrapper = document.getElementById('mainWrapper');
+        const toggle      = document.getElementById('sidebarToggle');
+
+        // Recupera estado salvo
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainWrapper.classList.add('sidebar-collapsed');
+        }
+
+        toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>
