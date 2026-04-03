@@ -93,6 +93,7 @@ class PetController extends Controller
             return redirect()->route('pets.index');
         }
 
+
     /**
      * Remove um pet do banco de dados.
      * Rota: DELETE /pets/{pet}

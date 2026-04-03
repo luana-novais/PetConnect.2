@@ -37,7 +37,7 @@
             <a href="#" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
                 <i class="bi bi-calendar3"></i> Agendamentos
             </a>
-            <a href="#" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
+            <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
                 <i class="bi bi-scissors"></i> Serviços
             </a>
             <a href="#" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
@@ -45,7 +45,7 @@
             </a>
 
             <div class="sidebar-label mt-2">Cadastros</div>
-            <a href="#" class="nav-link">
+            <a href="users/edit" class="nav-link">
                 <i class="bi bi-people"></i> Usuários
             </a>
             <a href="#" class="nav-link">
