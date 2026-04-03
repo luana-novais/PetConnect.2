@@ -1,4 +1,5 @@
 @extends('layout')
+@extends('layout')
 
 @section('title', 'Pets')
 @section('page-title', 'Meus Pets')
@@ -38,6 +39,9 @@
                 <label class="form-label mb-1">Espécie</label>
                 <select name="id_especie" class="form-select form-select-sm">
                     <option value="">Todas</option>
+                    @foreach($especies as $e)
+                        <option value="{{ $e->id }}" {{ request('id_especie') == $e->id ? 'selected' : '' }}>
+                            {{ $e->tipo_pet }}
                     @foreach($especies as $e)
                         <option value="{{ $e->id }}" {{ request('id_especie') == $e->id ? 'selected' : '' }}>
                             {{ $e->tipo_pet }}
@@ -86,6 +90,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>ID</th>
                             <th>Pet</th>
                             <th>Espécie / Raça</th>
                             <th>Dono</th>
@@ -98,6 +103,16 @@
                     <tbody>
                         @foreach($pets as $pet)
                         <tr>
+                            <td>{{ $pet->id }}</td>
+                            <td>{{ $pet->nome }}</td>
+                            <td>{{ $pet->especie->tipo_pet }} / {{ $pet->raca->nome }}</td>
+                            <td>{{ $pet->user->name }}</td>
+                            <td>{{ $pet->data_nascimento ? $pet->data_nascimento->format('d/m/Y') : '—' }}</td>
+                            <td>{{ $pet->peso ? number_format($pet->peso, 2, ',', '.') . ' kg' : '—' }}</td>
+                            <td>{{ $pet->sexo === 'MACHO' ? '♂ Macho' : '♀ Fêmea' }}</td>
+                            <td class="d-flex gap-2">
+                                <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="{{ route('pets.show', $pet->id) }}" class="btn btn-sm btn-info">Consultar</a>
                             <td>{{ $pet->id }}</td>
                             <td>{{ $pet->nome }}</td>
                             <td>{{ $pet->especie->tipo_pet }} / {{ $pet->raca->nome }}</td>
