@@ -55,7 +55,6 @@ class AgendamentoController extends Controller
 
         $data = $request->all();
         $data['status'] = 'pendente';
-        $data['data_agendamento'] = date('Y-m-d');
         
         Agendamento::create($data);
 

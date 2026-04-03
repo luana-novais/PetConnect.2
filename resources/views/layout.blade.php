@@ -36,7 +36,7 @@
                 <i class="bi bi-heart"></i>
                 <span class="nav-text">Pets</span>
             </a>
-            <a href="" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+            <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
                 <i class="bi bi-calendar3"></i>
                 <span class="nav-text">Agendamentos</span>
             </a>
@@ -44,7 +44,7 @@
                 <i class="bi bi-scissors"></i>
                 <span class="nav-text">Serviços</span>
             </a>
-            <a href="#" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
+            <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
                 <i class="bi bi-credit-card"></i>
                 <span class="nav-text">Pagamentos</span>
             </a>
@@ -52,10 +52,6 @@
             <div class="sidebar-label mt-2">Cadastros</div>
             <a href="#" class="nav-link">
                 <i class="bi bi-people"></i> Usuários
-            </a>
-            <a href="#" class="nav-link">
-                <i class="bi bi-tag"></i>
-                <span class="nav-text">Espécies & Raças</span>
             </a>
         </nav>
 
