@@ -48,19 +48,21 @@
                             <th>Cliente</th>
                             <th>Sitter</th>
                             <th>Serviço</th>
+                            <th>Valor</th>
                             <th>Data de Início</th>
                             <th>Status</th>
-                            <th style="width:180px;">Ações</th>
+                            <th style="width:300px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($agendamentos as $agendamento)
                         <tr>
-                            <td>{{ $agendamento->id }}</td>
+                            <td>#{{ $agendamento->id }}</td>
                             <td>{{ $agendamento->pet->nome ?? 'N/A' }}</td>
                             <td>{{ $agendamento->cliente->name ?? 'N/A' }}</td>
                             <td>{{ $agendamento->sitter->name ?? 'N/A' }}</td>
                             <td>{{ $agendamento->servico->nome ?? 'N/A' }}</td>
+                            <td>R$ {{ $agendamento->servico ? number_format($agendamento->servico->valor_servico, 2, ',', '.') : '—' }}</td>
                             <td>{{ $agendamento->data_inicio ? \Carbon\Carbon::parse($agendamento->data_inicio)->format('d/m/Y H:i') : '—' }}</td>
                             <td>
                                 @if($agendamento->status === 'pendente')
@@ -73,9 +75,34 @@
                                     <span class="badge bg-info">Concluído</span>
                                 @endif
                             </td>
-                            <td class="d-flex gap-2">
-                                <a href="{{ route('agendamentos.show', $agendamento->id) }}" class="btn btn-sm btn-info">Consultar</a>
-                                <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                            <td class="d-flex gap-2 flex-wrap">
+                                {{-- Botão de detalhes --}}
+
+                                
+                                <a href="{{ route('agendamentos.edit', $agendamento->id) }}" 
+                                   class="btn btn-sm btn-warning">
+                                    Editar
+                                </a>                                
+                                <a href="{{ route('agendamentos.show', $agendamento->id) }}" 
+                                   class="btn btn-sm btn-info">
+                                    Consultar
+                                </a>
+
+                                {{-- Botão pagar só aparece se pendente e sem pagamento --}}
+                                @if($agendamento->status === 'pendente' && !$agendamento->pagamento)
+                                    <a href="{{ route('pagamentos.create', $agendamento->id) }}" 
+                                       class="btn btn-sm btn-success">
+                                        💳 Pagar
+                                    </a>
+                                @endif
+
+                                {{-- Se já pagou, mostra o comprovante --}}
+                                @if($agendamento->pagamento)
+                                    <a href="{{ route('pagamentos.show', $agendamento->pagamento->id) }}" 
+                                       class="btn btn-sm btn-secondary">
+                                        🧾 Ver Pagamento
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach

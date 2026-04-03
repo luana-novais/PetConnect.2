@@ -70,7 +70,7 @@
                         <div class="mb-3">
                             <label class="form-label" style="color:#78716C; font-size:0.85rem;">Serviço</label>
                             <div style="color:#1C1917; font-weight:600;">{{ $agendamento->servico->nome }}</div>
-                            <div style="font-size:0.85rem; color:#78716C;">R$ {{ number_format($agendamento->servico->preco, 2, ',', '.') }}</div>
+                            <div style="font-size:0.85rem; color:#78716C;">R$ {{ number_format($agendamento->servico->valor_servico, 2, ',', '.') }}</div>
                         </div>
                     </div>
 
