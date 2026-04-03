@@ -77,14 +77,15 @@
                             </td>
                             <td class="d-flex gap-2 flex-wrap">
                                 {{-- Botão de detalhes --}}
-                                <a href="{{ route('agendamentos.show', $agendamento->id) }}" 
-                                   class="btn btn-sm btn-primary">
-                                    Ver
-                                </a>
+
                                 
                                 <a href="{{ route('agendamentos.edit', $agendamento->id) }}" 
                                    class="btn btn-sm btn-warning">
                                     Editar
+                                </a>                                
+                                <a href="{{ route('agendamentos.show', $agendamento->id) }}" 
+                                   class="btn btn-sm btn-info">
+                                    Consultar
                                 </a>
 
                                 {{-- Botão pagar só aparece se pendente e sem pagamento --}}
