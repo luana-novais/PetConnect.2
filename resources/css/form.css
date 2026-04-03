@@ -1,0 +1,87 @@
+/* =============================================
+   PetConnect – Pets / Create & Edit (shared)
+   ============================================= */
+
+/* ── Divisor de seção ── */
+.section-divider {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #A8A29E;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #F0EDEC;
+}
+
+/* ── Campos obrigatórios ── */
+.required-mark {
+    color: #EF4444;
+}
+
+/* ── Hint de campo ── */
+.field-hint {
+    font-size: 0.78rem;
+    color: #A8A29E;
+    margin-top: 0.25rem;
+}
+
+/* ── Opções de sexo (radio estilizado) ── */
+.sexo-options {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.sexo-option {
+    flex: 1;
+    border: 1px solid #E7E5E4;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    color: #78716C;
+    cursor: pointer;
+    background: #FAFAF9;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.sexo-option:hover {
+    border-color: #FDBA74;
+    background: #FFF7ED;
+}
+
+.sexo-option.selected-macho {
+    border-color: #93C5FD;
+    background: #EFF6FF;
+    color: #1D4ED8;
+    font-weight: 600;
+}
+
+.sexo-option.selected-femea {
+    border-color: #F9A8D4;
+    background: #FDF2F8;
+    color: #9D174D;
+    font-weight: 600;
+}
+
+/* ── Ícone de card-header ── */
+.card-header i {
+    color: #F97316;
+}
+
+/* ── Área de botões do formulário ── */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+/* ── Textarea de observações ── */
+.observacoes-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
