@@ -1,4 +1,5 @@
 @extends('layout')
+@extends('layout')
 
 @section('title', 'Editar Pet')
 @section('page-title', 'Editar Pet')
@@ -142,7 +143,7 @@
     const selectEspecie  = document.getElementById('id_especie');
     const selectRaca     = document.getElementById('id_raca');
     const todasRacas     = @json($racas);
-    const racaAtualId    = {{ $pet->id_raca }};
+    const racaAtualId    = @json($pet->id_raca ?? null);
 
     selectEspecie.addEventListener('change', function () {
         const especieId = parseInt(this.value);

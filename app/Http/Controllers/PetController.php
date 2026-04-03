@@ -21,8 +21,6 @@ class PetController extends Controller
     {
         $pets = Pet::paginate(10);
         $especies = Especie::all();
-        $pets = Pet::paginate(10);
-        $especies = Especie::all();
         return view('pets.index', compact('pets', 'especies'));
     }
 
@@ -32,10 +30,6 @@ class PetController extends Controller
      */
     public function create()
     {
-        $racas = Raca::all();
-        $especies = Especie::all();
-        $users = User::all();
-        return view('pets.create', compact('racas', 'especies', 'users'));
         $racas = Raca::all();
         $especies = Especie::all();
         $users = User::all();
@@ -65,16 +59,14 @@ class PetController extends Controller
      * Exibe os detalhes de um pet específico.
      * Rota: GET /pets/{pet}
      */
-
     public function show($id)
     {
         $pet = Pet::findOrFail($id);
         return view('pets.show',compact('pet'));
+
     }
 
     /**
-     * Exibe o formulário de edição de pet ou processa a atualização.
-     * Rota: GET/POST /pets/{id}/edit
      * Exibe o formulário de edição de pet ou processa a atualização.
      * Rota: GET/POST /pets/{id}/edit
      */
@@ -82,24 +74,12 @@ class PetController extends Controller
     {
         $pet = Pet::findOrFail($id);
         $users = User::all();
-        $especies = Especie::all();
+        $especie = Especie::all();
         $racas = Raca::all();
 
         return view('pets.edit', compact('pet', 'users', 'especie', 'racas'));
     }
 
-    public function update(Request $request, $id)
-        {
-            try{
-                $pet = Pet::findOrFail($id);
-                $pet->update($request->all());
-            } catch(Exception $e){
-                Log::error('Erro ao alterar o cadastro: '. $e->getMessage(), [
-                    'stack' => $e->getTraceAsString()
-                ]);
-            }
-            return redirect()->route('pets.index');
-        }
     public function update(Request $request, $id)
         {
             try{
