@@ -134,5 +134,47 @@
         </form>
     </div>
 </div>
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-camera-fill me-2 text-primary"></i>
+        Registrar Fotos
+    </div>
 
+    <div class="card-body">
+
+        <form enctype="multipart/form-data">
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Selecionar Foto do Pet
+                </label>
+
+                <input
+                    type="file"
+                    class="form-control"
+                    accept="image/*"
+                >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Descrição da Foto
+                </label>
+
+                <textarea
+                    class="form-control"
+                    rows="3"
+                    placeholder="Ex: Foto do pet durante passeio."
+                ></textarea>
+            </div>
+
+            <button type="button" class="btn btn-primary">
+                <i class="bi bi-upload me-1"></i>
+                Enviar Foto
+            </button>
+
+        </form>
+
+    </div>
+</div>
 @endsection

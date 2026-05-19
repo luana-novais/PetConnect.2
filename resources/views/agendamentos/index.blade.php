@@ -80,7 +80,8 @@
 
                                 
                                 <a href="{{ route('agendamentos.edit', $agendamento->id) }}" 
-                                   class="btn btn-sm btn-warning">
+                                   class="btn btn-sm btn-warning"
+                                   @if($agendamento->status !== 'pendente') disabled @endif>
                                     Editar
                                 </a>                                
                                 <a href="{{ route('agendamentos.show', $agendamento->id) }}" 
@@ -102,6 +103,18 @@
                                        class="btn btn-sm btn-secondary">
                                         🧾 Ver Pagamento
                                     </a>
+                                @endif
+
+                                {{-- Botão cancelar para agendamentos não finalizados --}}
+                                @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
+                                    <form action="{{ route('agendamentos.cancel', $agendamento->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">
+                                            ✕ Cancelar
+                                        </button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>

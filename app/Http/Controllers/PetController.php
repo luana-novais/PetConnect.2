@@ -41,19 +41,47 @@ class PetController extends Controller
      * Rota: POST /pets
      */
     public function store(Request $request)
-    {
-        try{
-            Pet::create($request->all());
-        }catch(Exception $e){
-            Log::error('Erro ao inserir o pet: '. $e->getMessage(),
-            [ 'stack' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Erro ao cadastrar o pet.');
-        }
+{
+    $request->validate([
+        'id_user' => 'required',
+        'nome' => 'required|max:255',
+        'data_nascimento' => 'nullable|date',
+        'id_especie' => 'required',
+        'id_raca' => 'required',
+        'peso' => 'nullable|numeric',
+        'sexo' => 'required|in:MACHO,FEMEA',
+        'observacoes' => 'nullable'
+    ]);
 
-        return redirect()
-            ->route('pets.index')
-            ->with('success', 'Pet cadastrado com sucesso!');
+    try {
+
+        Pet::create([
+            'id_user' => $request->id_user,
+            'nome' => $request->nome,
+            'data_nascimento' => $request->data_nascimento,
+            'id_especie' => $request->id_especie,
+            'id_raca' => $request->id_raca,
+            'peso' => $request->peso,
+            'sexo' => $request->sexo,
+            'observacoes' => $request->observacoes,
+        ]);
+
+    } catch(Exception $e){
+
+        dd($e->getMessage());
+
+        Log::error('Erro ao inserir o pet: '. $e->getMessage(), [
+            'stack' => $e->getTraceAsString()
+        ]);
+
+        return redirect()->back()
+            ->with('error', 'Erro ao cadastrar o pet.');
     }
+
+    return redirect()
+        ->route('pets.index')
+        ->with('success', 'Pet cadastrado com sucesso!');
+}
 
     /**
      * Exibe os detalhes de um pet específico.

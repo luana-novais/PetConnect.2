@@ -147,18 +147,181 @@
 
         {{-- Ações --}}
         <div class="card mt-3">
-            <div class="card-body p-2">
-                <form action="{{ route('agendamentos.destroy', $agendamento->id) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger w-100 btn-sm" onclick="return confirm('Tem certeza que deseja deletar este agendamento?')">
-                        <i class="bi bi-trash me-1"></i> Deletar Agendamento
+            <div class="card-header">
+                <i class="bi bi-lightning-fill me-2 text-warning"></i>Ações
+            </div>
+            <div class="card-body p-2 d-flex flex-column gap-2">
+                {{-- Cancelar Agendamento (F_F04) --}}
+                @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                        <i class="bi bi-x-circle me-1"></i> Cancelar Agendamento
                     </button>
-                </form>
+                @endif
+
+                {{-- Avaliar Usuário (F_F05) --}}
+                @if($agendamento->status === 'concluido')
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#avaliacaoModal">
+                        <i class="bi bi-star-fill me-1"></i> Deixar Avaliação
+                    </button>
+                @endif
+
+                {{-- Botão Editar --}}
+                @if($agendamento->status === 'pendente')
+                    <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                @endif
             </div>
         </div>
     </div>
 
 </div>
+
+{{-- MODAL: Cancelar Agendamento (F_F04) --}}
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Cancelar Agendamento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Tem certeza que deseja cancelar o agendamento <strong>#{{ $agendamento->id }}</strong>?
+                </p>
+                <div class="alert alert-warning mb-0">
+                    <small>A data e horário serão liberados novamente para o pet sitter.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não, manter agendamento</button>
+                <form action="{{ route('agendamentos.cancel', $agendamento->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Sim, cancelar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL: Avaliar Usuário (F_F05) --}}
+<div class="modal fade" id="avaliacaoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-star-fill me-2"></i>Deixar Avaliação
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('avaliacoes.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Avaliação para: <strong>{{ $agendamento->sitter->name }}</strong></label>
+                        <input type="hidden" name="id_user" value="{{ $agendamento->id_user_sitter }}">
+                        <input type="hidden" name="id_agendamento" value="{{ $agendamento->id }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nota (1 a 5 estrelas) <span class="text-danger">*</span></label>
+                        <div class="rating" id="rating">
+                            <i class="bi bi-star-fill" style="font-size:2rem; cursor:pointer; color:#ccc;" data-value="1"></i>
+                            <i class="bi bi-star-fill" style="font-size:2rem; cursor:pointer; color:#ccc; margin-left:10px;" data-value="2"></i>
+                            <i class="bi bi-star-fill" style="font-size:2rem; cursor:pointer; color:#ccc; margin-left:10px;" data-value="3"></i>
+                            <i class="bi bi-star-fill" style="font-size:2rem; cursor:pointer; color:#ccc; margin-left:10px;" data-value="4"></i>
+                            <i class="bi bi-star-fill" style="font-size:2rem; cursor:pointer; color:#ccc; margin-left:10px;" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="nota" name="nota" value="0" required>
+                        <small class="text-muted d-block mt-2" id="notaTexto">Clique nas estrelas para avaliar</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Comentários (Opcional)</label>
+                        <textarea name="comentarios" class="form-control" rows="4" placeholder="Compartilhe sua experiência..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-lg me-1"></i> Enviar Avaliação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating i {
+        transition: all 0.2s ease;
+    }
+
+    .rating i:hover,
+    .rating i.active {
+        color: #ffc107 !important;
+    }
+</style>
+
+<script>
+    // Sistema de rating interativo
+    const stars = document.querySelectorAll('#rating i');
+    const notaInput = document.getElementById('nota');
+    const notaTexto = document.getElementById('notaTexto');
+
+    const textos = {
+        1: 'Muito insatisfeito',
+        2: 'Insatisfeito',
+        3: 'Neutro',
+        4: 'Satisfeito',
+        5: 'Muito satisfeito'
+    };
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            notaInput.value = value;
+            notaTexto.textContent = textos[value];
+
+            stars.forEach(s => {
+                if (s.getAttribute('data-value') <= value) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+
+        star.addEventListener('mouseenter', function() {
+            const value = this.getAttribute('data-value');
+            stars.forEach(s => {
+                if (s.getAttribute('data-value') <= value) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ccc';
+                }
+            });
+        });
+    });
+
+    document.getElementById('rating').addEventListener('mouseleave', function() {
+        const selectedNote = notaInput.value;
+        stars.forEach(s => {
+            if (selectedNote && s.getAttribute('data-value') <= selectedNote) {
+                s.classList.add('active');
+                s.style.color = '#ffc107';
+            } else {
+                s.classList.remove('active');
+                s.style.color = '#ccc';
+            }
+        });
+    });
+</script>
 
 @endsection

@@ -26,7 +26,7 @@
 
         <nav class="sidebar-nav">
             <div class="sidebar-label">Principal</div>
-            <a href="#" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('welcome') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-grid-1x2"></i>
                 <span class="nav-text">Dashboard</span>
             </a>
@@ -89,7 +89,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
-                                <a href="#" class="text-decoration-none" style="color:var(--pet-primary)">Home</a>
+                                <a href="{{ route('welcome') }}" class="text-decoration-none" style="color:var(--pet-primary)">Home</a>
                             </li>
                             @yield('breadcrumb')
                         </ol>
@@ -101,7 +101,35 @@
                     <i class="bi bi-bell fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;">3</span>
                 </a>
-                
+
+                {{-- Menu de Usuário --}}
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle me-2"></i>
+                        <span class="d-none d-sm-inline">{{ auth()->user()->name ?? 'Usuário' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('users.show', auth()->user()->id) }}">
+                                <i class="bi bi-person me-2"></i>Meu Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-gear me-2"></i>Configurações
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('auth.logout') }}" method="POST" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
