@@ -33,6 +33,8 @@
             @csrf
 
             {{-- Erros gerais --}}
+
+            {{-- Erros gerais --}}
             @if($errors->any())
                 <div class="alert alert-danger d-flex align-items-start gap-2 mb-4">
                     <i class="bi bi-exclamation-triangle-fill mt-1"></i>
@@ -70,22 +72,13 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="id_user" class="form-label">Dono do Pet <span class="text-danger">*</span></label>
-                            <select id="id_user" name="id_user"
-                                    class="form-select @error('id_user') is-invalid @enderror" required>
-                                <option value="">Selecione o dono...</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('id_user') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('id_user')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <label class="form-label">Dono do Pet</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ auth()->user()->name }}"
+                                   readonly disabled>
                         </div>
 
-                        
                         <div class="col-md-6">
                             <label for="data_nascimento" class="form-label">Data de Nascimento</label>
                             <input type="date"
@@ -104,8 +97,8 @@
                             <select id="sexo" name="sexo"
                                     class="form-select @error('sexo') is-invalid @enderror" required>
                                 <option value="">Selecione...</option>
-                                <option value="MACHO" {{ old('sexo') === 'MACHO' ? 'selected' : '' }}>♂ Macho</option>
-                                <option value="FEMEA" {{ old('sexo') === 'FEMEA' ? 'selected' : '' }}>♀ Fêmea</option>
+                                <option value="MACHO" {{ old('sexo') === 'MACHO' ? 'selected' : '' }}>Macho</option>
+                                <option value="FEMEA" {{ old('sexo') === 'FEMEA' ? 'selected' : '' }}>Fêmea</option>
                             </select>
                             @error('sexo')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -139,14 +132,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <label for="id_especie" class="form-label">Espécie <span class="text-danger">*</span></label>
                             <select id="id_especie" name="id_especie"
                                     class="form-select @error('id_especie') is-invalid @enderror" required>
                                 <option value="">Selecione a espécie...</option>
                                 @foreach($especies as $especie)
-                                    <option value="{{ $especie->id }}" {{ old('id_especie') == $especie->id ? 'selected' : '' }}>
+                                    <option value="{{ $especie->id }}" {{ old('id_especie', $selectedEspecie) == $especie->id ? 'selected' : '' }}>
                                         {{ $especie->tipo_pet }}
                                     </option>
                                 @endforeach
@@ -154,6 +146,11 @@
                             @error('id_especie')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-secondary w-100" formaction="{{ route('pets.create') }}" formmethod="GET" formnovalidate>
+                                Filtrar raças
+                            </button>
                         </div>
 
                         <div class="col-md-6">
@@ -167,6 +164,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if(!$selectedEspecie)
+                                <div class="form-text text-muted">Selecione a espécie antes de escolher a raça.</div>
+                            @endif
                             @error('id_raca')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

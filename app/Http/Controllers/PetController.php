@@ -28,12 +28,13 @@ class PetController extends Controller
      * Exibe o formulário de criação de pet.
      * Rota: GET /pets/create
      */
-    public function create()
+    public function create(Request $request)
     {
-        $racas = Raca::all();
+        $selectedEspecie = $request->query('id_especie') ?? old('id_especie');
+        $racas = $selectedEspecie ? Raca::where('id_especie', $selectedEspecie)->get() : collect();
         $especies = Especie::all();
-        $users = User::all();
-        return view('pets.create', compact('racas', 'especies', 'users'));
+
+        return view('pets.create', compact('racas', 'especies', 'selectedEspecie'));
     }
 
     /**
@@ -43,28 +44,27 @@ class PetController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'id_user' => 'required',
-        'nome' => 'required|max:255',
-        'data_nascimento' => 'nullable|date',
-        'id_especie' => 'required',
-        'id_raca' => 'required',
-        'peso' => 'nullable|numeric',
-        'sexo' => 'required|in:MACHO,FEMEA',
-        'observacoes' => 'nullable'
-    ]);
-
-    try {
-
-        Pet::create([
-            'id_user' => $request->id_user,
-            'nome' => $request->nome,
-            'data_nascimento' => $request->data_nascimento,
-            'id_especie' => $request->id_especie,
-            'id_raca' => $request->id_raca,
-            'peso' => $request->peso,
-            'sexo' => $request->sexo,
-            'observacoes' => $request->observacoes,
+            'nome' => 'required|max:255',
+            'data_nascimento' => 'nullable|date',
+            'id_especie' => 'required',
+            'id_raca' => 'required',
+            'peso' => 'nullable|numeric',
+            'sexo' => 'required|in:MACHO,FEMEA',
+            'observacoes' => 'nullable'
         ]);
+
+        try {
+
+            Pet::create([
+                'id_user' => auth()->id(),
+                'nome' => $request->nome,
+                'data_nascimento' => $request->data_nascimento,
+                'id_especie' => $request->id_especie,
+                'id_raca' => $request->id_raca,
+                'peso' => $request->peso,
+                'sexo' => $request->sexo,
+                'observacoes' => $request->observacoes,
+            ]);
 
     } catch(Exception $e){
 
