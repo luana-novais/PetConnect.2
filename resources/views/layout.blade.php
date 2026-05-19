@@ -3,180 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetConnect - @yield('title', 'Painel')</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- CSS Global PetConnect -->
+    <title>PetConnect - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="{{ asset('app.css') }}" rel="stylesheet">
-
-    @stack('styles')
 </head>
-<body>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-
-        <div class="sidebar-brand d-flex align-items-center gap-2">
-            <span class="logo-icon">🐾</span>
-            <span class="logo-text">Pet<em>Connect</em></span>
-        </div>
-
-        <nav class="sidebar-nav">
-            <div class="sidebar-label">Principal</div>
-            <a href="{{ route('welcome') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2"></i>
-                <span class="nav-text">Dashboard</span>
-            </a>
-
-            <div class="sidebar-label mt-2">Gestão</div>
-            <a href="{{ route('pets.index') }}" class="nav-link {{ request()->is('pets*') ? 'active' : '' }}">
-                <i class="bi bi-heart"></i>
-                <span class="nav-text">Pets</span>
-            </a>
-            <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
-                <i class="bi bi-calendar3"></i>
-                <span class="nav-text">Agendamentos</span>
-            </a>
-            <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
-                <i class="bi bi-scissors"></i>
-                <span class="nav-text">Serviços</span>
-            </a>
-            <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
-                <i class="bi bi-credit-card"></i>
-                <span class="nav-text">Pagamentos</span>
-            </a>
-
-            <div class="sidebar-label mt-2">Cadastros</div>
-            <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
-                <i class="bi bi-people"></i> Usuários
-            </a>
-        </nav>
-
-        <!-- Rodapé do usuário -->
-        <div class="sidebar-footer">
-            <div class="d-flex align-items-center gap-2">
-                <div class="sidebar-user-avatar flex-shrink-0">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                </div>
-                <div class="nav-text" style="overflow:hidden;">
-                    <div class="text-white fw-semibold" style="font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                        {{ auth()->user()->name ?? 'Usuário' }}
-                    </div>
-                    <div style="font-size:0.72rem;color:#78716C;">
-                        {{ auth()->user()->role ?? 'CLI' }}
+<body class="auth-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-section">
+                    <div class="logo-icon">🐾</div>
+                    <div class="logo-text">
+                        <h1>PetConnect</h1>
                     </div>
                 </div>
+                <p>Plataforma de Conexão entre Tutores e Pet Sitters</p>
             </div>
-        </div>
 
-    </aside>
+            <div class="login-body">
+                {{-- Erros de validação --}}
+                @if($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Erro de autenticação!</strong>
+                        <ul class="mb-0 mt-2 ps-3">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-    <!-- Main -->
-    <div class="main-wrapper" id="mainWrapper">
+                {{-- Mensagem de sucesso --}}
+                @if(session('success'))
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-        <!-- Topbar -->
-        <div class="topbar">
-            <div class="d-flex align-items-center gap-3">
-                <!-- Botão de recolher -->
-                <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle" title="Recolher menu">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-                <div>
-                    <h6 class="page-title">@yield('page-title', 'Painel')</h6>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('welcome') }}" class="text-decoration-none" style="color:var(--pet-primary)">Home</a>
-                            </li>
-                            @yield('breadcrumb')
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="#" class="text-secondary position-relative">
-                    <i class="bi bi-bell fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;">3</span>
-                </a>
+                <form action="{{ route('auth.login.store') }}" method="POST">
+                    @csrf
 
-                {{-- Menu de Usuário --}}
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle me-2"></i>
-                        <span class="d-none d-sm-inline">{{ auth()->user()->name ?? 'Usuário' }}</span>
+                    {{-- Email --}}
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope me-2"></i>Email
+                        </label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="form-control @error('email') is-invalid @enderror"
+                               placeholder="seu@email.com"
+                               value="{{ old('email') }}"
+                               required
+                               autofocus>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Senha --}}
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-2"></i>Senha
+                        </label>
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               class="form-control @error('password') is-invalid @enderror"
+                               placeholder="••••••••"
+                               required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Lembrar-me e Esqueci Senha --}}
+                    <div class="remember-forgot">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">
+                                Lembrar-me
+                            </label>
+                        </div>
+                        <a href="#">Esqueci a senha</a>
+                    </div>
+
+                    {{-- Botão Login --}}
+                    <button type="submit" class="btn btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar na Plataforma
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('users.show', auth()->user()->id) }}">
-                                <i class="bi bi-person me-2"></i>Meu Perfil
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-gear me-2"></i>Configurações
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('auth.logout') }}" method="POST" style="display: inline;">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
+                </form>
+
+                {{-- Divider --}}
+                <div class="divider">
+                    <span>Não tem conta?</span>
+                </div>
+
+                {{-- Link para Registro --}}
+                <div class="register-link">
+                    <p>Crie uma conta para começar agora mesmo!</p>
+                    <a href="{{ route('auth.register') }}" class="btn btn-outline-primary w-100 mt-2">
+                        <i class="bi bi-person-plus me-2"></i>Criar Conta
+                    </a>
                 </div>
             </div>
-        </div>
-
-        <!-- Content -->
-        <div class="content-area">
-
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ session('success') }}</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span>{{ session('error') }}</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @yield('content')
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        const sidebar     = document.getElementById('sidebar');
-        const mainWrapper = document.getElementById('mainWrapper');
-        const toggle      = document.getElementById('sidebarToggle');
-
-        // Recupera estado salvo
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-            sidebar.classList.add('collapsed');
-            mainWrapper.classList.add('sidebar-collapsed');
-        }
-
-        toggle.addEventListener('click', function () {
-            sidebar.classList.toggle('collapsed');
-            mainWrapper.classList.toggle('sidebar-collapsed');
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-        });
-    </script>
-
-    @stack('scripts')
-</body>
+    </body>
 </html>
