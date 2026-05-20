@@ -19,6 +19,7 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.reg
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
+
 // Rotas protegidas (requerem autenticação)
 Route::middleware('auth')->group(function () {
 
@@ -53,12 +54,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pagamentos/{id}', [PagamentoController::class, 'destroy'])->name('pagamentos.destroy');
 });
 
-// Rota raiz — redireciona para dashboard se autenticado, senão para login
+// Rota de landing page pública
+Route::get('/landing', function () {
+    return view('landing');
+})->name('landing');
+
+// Rota estática que explica o que é a plataforma PetConnect
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+// Rota raiz — redireciona para dashboard se autenticado ou para a landing page pública
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('welcome');
     }
-    return redirect()->route('auth.login');
+    return redirect()->route('landing');
 })->name('home');
 
 // Rota de boas-vindas/dashboard
