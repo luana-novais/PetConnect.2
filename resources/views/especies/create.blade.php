@@ -47,15 +47,14 @@
                 <form action="{{ route('especies.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="tipo_pet" class="form-label">Tipo de Pet <span class="text-danger">*</span></label>
-                        <select id="tipo_pet" name="tipo_pet"
-                                class="form-select @error('tipo_pet') is-invalid @enderror" required>
-                            <option value="">Selecione...</option>
-                            <option value="GATO" {{ old('tipo_pet') === 'GATO' ? 'selected' : '' }}>🐱 Gato</option>
-                            <option value="CACHORRO" {{ old('tipo_pet') === 'CACHORRO' ? 'selected' : '' }}>🐶 Cachorro</option>
-                            <option value="PEQUENOS MAMIFEROS" {{ old('tipo_pet') === 'PEQUENOS MAMIFEROS' ? 'selected' : '' }}>🐹 Pequenos Mamíferos</option>
-                            <option value="EXOTICOS" {{ old('tipo_pet') === 'EXOTICOS' ? 'selected' : '' }}>🦜 Exóticos</option>
-                        </select>
+                        <label for="tipo_pet" class="form-label">Espécie de Pet <span class="text-danger">*</span></label>
+                        <input type="text"
+                               id="tipo_pet"
+                               name="tipo_pet"
+                               class="form-control @error('tipo_pet') is-invalid @enderror"
+                               placeholder="Digite a nova espécie"
+                               value="{{ old('tipo_pet') }}"
+                               required>
                         @error('tipo_pet')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

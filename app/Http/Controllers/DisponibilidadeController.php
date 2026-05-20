@@ -13,8 +13,8 @@ class DisponibilidadeController extends Controller
     {
         // PRO vê só suas disponibilidades
         $disponibilidades = auth()->user()->role === 'ADM'
-            ? Disponibilidade::paginate(10)
-            : Disponibilidade::where('id_user', auth()->id())->paginate(10);
+            ? Disponibilidade::with('user')->paginate(10)
+            : Disponibilidade::where('id_user', auth()->id())->with('user')->paginate(10);
 
         return view('disponibilidades.index', compact('disponibilidades'));
     }

@@ -18,14 +18,7 @@
         <h5 class="fw-bold mb-1" style="color:#1C1917;">Lista de Agendamentos</h5>
         <p class="text-muted mb-0" style="font-size:0.88rem;">Gerencie todos os agendamentos de serviços.</p>
     </div>
-    <a href="{{ route('agendamentos.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
-        <i class="bi bi-plus-lg"></i> Novo Agendamento
-    </a>
-</div>
 
-{{-- Tabela --}}
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-calendar2-check me-2 text-primary"></i>Agendamentos</span>
         <span class="badge bg-light text-secondary border">{{ count($agendamentos) }} registros</span>
     </div>
@@ -34,9 +27,7 @@
             <div class="text-center py-5">
                 <div style="font-size:3rem;">📅</div>
                 <p class="text-muted mt-2 mb-3">Nenhum agendamento cadastrado ainda.</p>
-                <a href="{{ route('agendamentos.create') }}" class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-lg"></i> Criar primeiro agendamento
-                </a>
+
             </div>
         @else
             <div class="table-responsive">
@@ -51,7 +42,8 @@
                             <th>Valor</th>
                             <th>Data de Início</th>
                             <th>Status</th>
-                            <th style="width:300px;">Ações</th>
+                            <th>Pagamento</th>
+                            <th style="width:340px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,6 +65,19 @@
                                     <span class="badge bg-danger">Cancelado</span>
                                 @else
                                     <span class="badge bg-info">Concluído</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($agendamento->pagamento)
+                                    @if($agendamento->pagamento->status_pagamento === 'pago')
+                                        <span class="badge bg-success">Pago</span>
+                                    @elseif($agendamento->pagamento->status_pagamento === 'pendente')
+                                        <span class="badge bg-warning">Pendente</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ ucfirst($agendamento->pagamento->status_pagamento) }}</span>
+                                    @endif
+                                @else
+                                    <span class="badge bg-secondary">Sem pagamento</span>
                                 @endif
                             </td>
                             <td class="d-flex gap-2 flex-wrap">
@@ -103,6 +108,17 @@
                                        class="btn btn-sm btn-secondary">
                                         🧾 Ver Pagamento
                                     </a>
+                                @endif
+
+                                {{-- Botão confirmar apenas para sitter --}}
+                                @if(auth()->user()->role === 'PRO' && $agendamento->status === 'pendente')
+                                    <form action="{{ route('agendamentos.confirm', $agendamento->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Confirmar este agendamento?')">
+                                            ✓ Confirmar
+                                        </button>
+                                    </form>
                                 @endif
 
                                 {{-- Botão cancelar para agendamentos não finalizados --}}

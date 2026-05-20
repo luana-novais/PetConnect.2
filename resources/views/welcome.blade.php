@@ -118,7 +118,15 @@
                         <i class="bi bi-scissors me-2"></i>Gerenciar Serviços
                     </a>
                     <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-calendar3 me-2"></i>Ver Agendamentos
+                        <i class="bi bi-calendar3 me-2"></i>Gerenciar Agendamentos
+                    </a>
+                    <a href="{{ route('especies.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-tags me-2"></i>
+                        Gerenciar Espécies
+                    </a>
+                    <a href="{{ route('racas.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-diagram-3 me-2"></i>
+                    Gerenciar Raças
                     </a>
                 @elseif(auth()->user()->role === 'CLI')
                     <a href="{{ route('agendamentos.create') }}" class="btn btn-primary btn-sm">
@@ -127,14 +135,17 @@
                     <a href="{{ route('pets.create') }}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-plus-circle me-2"></i>Adicionar Pet
                     </a>
+                    <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-calendar3 me-2"></i>Ver Agendamentos
+                    </a>
                 @else
-                    <a href="{{ route('users.show', auth()->user()->id) }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-pencil me-2"></i>Editar Disponibilidade
+                    <a href="{{ route('disponibilidades.index') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-clock me-2"></i>Gerenciar Disponibilidade
+                    </a>
+                    <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-calendar3 me-2"></i>Ver Agendamentos
                     </a>
                 @endif
-                <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-calendar3 me-2"></i>Ver Agendamentos
-                </a>
             </div>
         </div>
     </div>

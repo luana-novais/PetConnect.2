@@ -13,15 +13,23 @@ use Exception;
 class UserController extends Controller
 {
     public function index()
-{
-    $user = User::with(['telefone', 'endereco'])->findOrFail(1);
-    return view('users.index', compact('user'));
-}
+    {
+        if (auth()->user()->role === 'ADM') {
+            $users = User::with(['telefone', 'endereco'])->get();
+        } else {
+            // Não-ADM vê apenas o próprio perfil; envolve em coleção
+            // para que a view use sempre $users com @foreach
+            $users = User::with(['telefone', 'endereco'])
+                ->where('id', auth()->id())
+                ->get();
+        }
+
+        return view('users.index', compact('users'));
+    }
 
     public function create()
     {
-        $users = User::all();
-        return view('users.create', compact('users'));
+        return view('users.create');
     }
 
     public function store(Request $request)
@@ -30,6 +38,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8',
+            'role'     => 'required|in:ADM,PRO,CLI',
             'numero'   => 'nullable|string|max:20',
             'endereco' => 'nullable|string|max:255',
             'cidade'   => 'nullable|string|max:100',
@@ -42,6 +51,7 @@ class UserController extends Controller
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'password' => bcrypt($request->password),
+                'role'     => $request->role,
             ]);
 
             if ($request->filled('numero')) {
@@ -68,16 +78,45 @@ class UserController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $user = auth()->user();
+
+        // Não-ADM só pode ver o próprio perfil
+        if ($user->role !== 'ADM' && $user->id !== (int) $id) {
+            abort(403);
+        }
+
+        $user     = User::with(['telefone', 'endereco'])->findOrFail($id);
+        $telefone = $user->telefone;
+        $endereco = $user->endereco;
+
+        return view('users.edit', compact('user', 'telefone', 'endereco'));
+    }
+
     public function edit($id)
     {
+        $user = auth()->user();
+
+        if ($user->role !== 'ADM' && $user->id !== (int) $id) {
+            abort(403);
+        }
+
         $user     = User::findOrFail($id);
         $telefone = Telefone::where('id_user', $id)->first();
         $endereco = Endereco::where('id_user', $id)->first();
+
         return view('users.edit', compact('user', 'telefone', 'endereco'));
     }
 
     public function update(Request $request, $id)
     {
+        $authUser = auth()->user();
+
+        if ($authUser->role !== 'ADM' && $authUser->id !== (int) $id) {
+            abort(403);
+        }
+
         $request->validate([
             'name'             => 'required|string|max:255',
             'email'            => 'required|email|unique:users,email,' . $id,
@@ -93,13 +132,11 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
 
-            // Dados pessoais
             $user->update([
                 'name'  => $request->name,
                 'email' => $request->email,
             ]);
 
-            // Senha
             if ($request->filled('current_password')) {
                 if (!Hash::check($request->current_password, $user->password)) {
                     return back()
@@ -109,13 +146,11 @@ class UserController extends Controller
                 $user->update(['password' => bcrypt($request->password)]);
             }
 
-            // Telefone
             Telefone::updateOrCreate(
                 ['id_user' => $id],
                 ['numero'  => $request->numero]
             );
 
-            // Endereço
             Endereco::updateOrCreate(
                 ['id_user' => $id],
                 [
@@ -135,9 +170,12 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        if (auth()->user()->role !== 'ADM') {
+            abort(403);
+        }
+
         try {
             $user = User::findOrFail($id);
-
             Telefone::where('id_user', $id)->delete();
             Endereco::where('id_user', $id)->delete();
             $user->delete();

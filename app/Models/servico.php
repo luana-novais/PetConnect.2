@@ -14,6 +14,7 @@ class Servico extends Model
     protected $fillable = [
         'nome',
         'valor_servico',
+        'id_user',
     ];
 
     protected $casts = [
@@ -25,5 +26,10 @@ class Servico extends Model
     public function agendamentos()
     {
         return $this->hasMany(Agendamento::class, 'id_servico');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

@@ -20,10 +20,13 @@ class EspecieController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tipo_pet' => 'required|in:GATO,CACHORRO,PEQUENOS MAMIFEROS,EXOTICOS',
+            'tipo_pet' => 'required|string|max:255',
         ]);
 
-        Especie::create($request->only('tipo_pet'));
+        Especie::create([
+            'tipo_pet' => trim($request->input('tipo_pet')),
+        ]);
+
         return redirect()->route('especies.index')->with('success', 'Espécie cadastrada com sucesso!');
     }
 
@@ -36,11 +39,14 @@ class EspecieController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'tipo_pet' => 'required|in:GATO,CACHORRO,PEQUENOS MAMIFEROS,EXOTICOS',
+            'tipo_pet' => 'required|string|max:255',
         ]);
 
         $especie = Especie::findOrFail($id);
-        $especie->update($request->only('tipo_pet'));
+        $especie->update([
+            'tipo_pet' => trim($request->input('tipo_pet')),
+        ]);
+
         return redirect()->route('especies.index')->with('success', 'Espécie atualizada com sucesso!');
     }
 

@@ -19,12 +19,6 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
-        <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-    </div>
-@endif
-
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-list-ul me-2 text-warning"></i>Espécies Cadastradas</span>

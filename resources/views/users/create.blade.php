@@ -66,6 +66,20 @@
                         @enderror
                     </div>
                     <div class="col-md-6">
+                        <label for="role" class="form-label">Perfil <span class="text-danger">*</span></label>
+                        <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>Selecione um perfil</option>
+                            <option value="ADM" {{ old('role') === 'ADM' ? 'selected' : '' }}>Administrador</option>
+                            <option value="PRO" {{ old('role') === 'PRO' ? 'selected' : '' }}>Profissional</option>
+                            <option value="CLI" {{ old('role') === 'CLI' ? 'selected' : '' }}>Cliente</option>
+                        </select>
+                        @error('role')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <label for="numero" class="form-label">Telefone <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('numero') is-invalid @enderror" id="numero" name="numero" value="{{ old('numero') }}" placeholder="(11) 98765-4321" required>
                         @error('numero')

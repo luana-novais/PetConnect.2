@@ -145,12 +145,47 @@
             </div>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="bi bi-wallet2 me-2 text-primary"></i>Pagamento
+            </div>
+            <div class="card-body">
+                @if($agendamento->pagamento)
+                    <p class="mb-2">
+                        <strong>Status:</strong>
+                        @if($agendamento->pagamento->status_pagamento === 'pago')
+                            <span class="badge bg-success">Pago</span>
+                        @elseif($agendamento->pagamento->status_pagamento === 'pendente')
+                            <span class="badge bg-warning">Pendente</span>
+                        @else
+                            <span class="badge bg-secondary">{{ ucfirst($agendamento->pagamento->status_pagamento) }}</span>
+                        @endif
+                    </p>
+                    <p class="mb-2"><strong>Método:</strong> {{ $agendamento->pagamento->metodo_pagamento ?? '—' }}</p>
+                    <p class="mb-0"><strong>Valor:</strong> R$ {{ number_format($agendamento->pagamento->valor ?? $agendamento->servico->valor_servico, 2, ',', '.') }}</p>
+                @else
+                    <p class="mb-0 text-muted">Ainda não há pagamento registrado para este agendamento.</p>
+                @endif
+            </div>
+        </div>
+
         {{-- Ações --}}
         <div class="card mt-3">
             <div class="card-header">
                 <i class="bi bi-lightning-fill me-2 text-warning"></i>Ações
             </div>
             <div class="card-body p-2 d-flex flex-column gap-2">
+                {{-- Confirmar Agendamento para sitter --}}
+                @if(auth()->user()->role === 'PRO' && $agendamento->status === 'pendente' && $agendamento->id_user_sitter === auth()->id())
+                    <form action="{{ route('agendamentos.confirm', $agendamento->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Confirmar este agendamento?')">
+                            <i class="bi bi-check-circle me-1"></i> Confirmar Agendamento
+                        </button>
+                    </form>
+                @endif
+
                 {{-- Cancelar Agendamento (F_F04) --}}
                 @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
@@ -159,14 +194,14 @@
                 @endif
 
                 {{-- Avaliar Usuário (F_F05) --}}
-                @if($agendamento->status === 'concluido')
+                @if($agendamento->status === 'concluido' && auth()->user()->role === 'CLI')
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#avaliacaoModal">
                         <i class="bi bi-star-fill me-1"></i> Deixar Avaliação
                     </button>
                 @endif
 
                 {{-- Botão Editar --}}
-                @if($agendamento->status === 'pendente')
+                @if($agendamento->status === 'pendente' && auth()->user()->role !== 'PRO')
                     <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil me-1"></i> Editar
                     </a>
