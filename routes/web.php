@@ -60,11 +60,6 @@ Route::get('/landing', function () {
     return view('landing');
 })->name('landing');
 
-// Rota estática que explica o que é a plataforma PetConnect
-Route::get('/about', function () {
-    return view('about');
-})->name('about');
-
 // Rota raiz — redireciona para dashboard se autenticado ou para a landing page pública
 Route::get('/', function () {
     if (auth()->check()) {

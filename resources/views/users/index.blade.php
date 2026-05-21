@@ -71,7 +71,8 @@
             @endif
         </div>
     </div>
-@else
+@elseif(in_array(auth()->user()->role, ['PRO', 'CLI']))
+    @php $user = auth()->user(); @endphp
     <div class="row justify-content-center">
         <div class="col-xl-8 col-lg-10">
 
@@ -81,9 +82,9 @@
                     <h5 class="fw-semibold mb-1">Meu Perfil</h5>
                     <p class="text-muted mb-0" style="font-size:.85rem;">Informações da sua conta no PetConnect.</p>
                 </div>
-                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary d-flex align-items-center gap-2">
-                    <i class="bi bi-pencil"></i> Editar Perfil
-                </a>
+                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil"></i> Editar Perfil
+                    </a>
             </div>
 
             {{-- Card: Dados Pessoais --}}

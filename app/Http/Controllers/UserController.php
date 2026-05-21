@@ -98,6 +98,10 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
+        if ($user->role === 'CLI') {
+            abort(403);
+        }
+
         if ($user->role !== 'ADM' && $user->id !== (int) $id) {
             abort(403);
         }
@@ -113,7 +117,7 @@ class UserController extends Controller
     {
         $authUser = auth()->user();
 
-        if ($authUser->role !== 'ADM' && $authUser->id !== (int) $id) {
+        if ($authUser->role === 'CLI' || ($authUser->role !== 'ADM' && $authUser->id !== (int) $id)) {
             abort(403);
         }
 

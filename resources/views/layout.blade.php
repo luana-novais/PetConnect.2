@@ -92,7 +92,7 @@
                 </a>
 
                 <div class="sidebar-label mt-2">Conta</div>
-                <a href="{{ route('users.edit', auth()->id()) }}" class="nav-link {{ request()->is('users/'.auth()->id().'/edit') ? 'active' : '' }}">
+                <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
                     <i class="bi bi-person-gear"></i>
                     <span class="nav-text">Meu Perfil</span>
                 </a>
@@ -115,7 +115,7 @@
                 </a>
 
                 <div class="sidebar-label mt-2">Conta</div>
-                <a href="{{ route('users.edit', auth()->id()) }}" class="nav-link {{ request()->is('users/'.auth()->id().'/edit') ? 'active' : '' }}">
+                <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
                     <i class="bi bi-person-gear"></i>
                     <span class="nav-text">Meu Perfil</span>
                 </a>

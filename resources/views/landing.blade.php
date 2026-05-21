@@ -7,6 +7,29 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('app.css') }}" rel="stylesheet">
+    <style>
+        body.landing-page {
+            background: #f6f8fb;
+            min-height: 100vh;
+        }
+        .hero-panel {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fb 100%);
+            border: 1px solid rgba(249, 115, 22, .08);
+            box-shadow: 0 24px 48px rgba(15, 23, 42, .08);
+        }
+        .hero-panel .gradient-section {
+            background: linear-gradient(180deg, #F97316 0%, #EA580C 100%);
+            color: #fff;
+        }
+        .feature-card-modern {
+            background: #fff;
+            border: 1px solid #e9edf6;
+        }
+        .badge-soft {
+            background: rgba(249, 115, 22, .12);
+            color: #EA580C;
+        }
+    </style>
 </head>
 <body class="landing-page">
     <div class="container py-5">
@@ -15,16 +38,11 @@
                 <div class="brand-mark">🐾</div>
                 <div>
                     <a href="{{ route('home') }}" class="brand-title">PetConnect</a>
+                </div>
+                <div>
                     <p class="mb-0 text-muted small">A plataforma para cuidar dos pets com confiança.</p>
                 </div>
             </div>
-
-            <nav class="landing-nav d-none d-md-flex align-items-center gap-4">
-                <a href="#hero" class="landing-nav-link">Início</a>
-                <a href="#features" class="landing-nav-link">Recursos</a>
-                <a href="{{ route('about') }}" class="landing-nav-link">Sobre</a>
-                <a href="#contact" class="landing-nav-link">Contato</a>
-            </nav>
 
             <div class="landing-header-actions d-flex gap-2 flex-wrap">
                 <a href="{{ route('auth.login') }}" class="btn btn-link landing-login-link">Entrar</a>
@@ -32,64 +50,68 @@
             </div>
         </header>
 
-        <section id="hero" class="landing-hero card shadow-lg overflow-hidden position-relative">
-            <div class="decor-circle decor-circle-1"></div>
-            <div class="decor-circle decor-circle-2"></div>
-            <div class="row g-0 align-items-center">
-                <div class="col-lg-6 hero-copy p-5 position-relative">
-                    <span class="badge bg-orange-soft text-orange mb-3">Plataforma de cuidados para pets</span>
-                    <h2 class="display-5 fw-bold mb-4">Conecte seu pet com o melhor cuidado em poucos minutos.</h2>
-                    <p class="text-muted fs-5 mb-4">Descomplique agendamentos, encontre cuidadores confiáveis e gerencie todos os serviços do seu animal em um único lugar.</p>
-
-                    <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-                        <a href="{{ route('auth.register') }}" class="btn btn-login btn-lg" id='botao-comecar-agora'>Começar agora</a>
-                        <a href="{{ route('about') }}" class="btn btn-outline-register btn-lg">Veja como funciona</a>
+        <section id="hero" class="hero-panel rounded-4 overflow-hidden mb-5">
+            <div class="row g-0">
+                <div class="col-lg-5 gradient-section p-5 d-flex flex-column justify-content-center">
+                    <div class="mb-4">
+                        <div class="display-6 fw-bold">PetConnect</div>
+                        <p class="lead mb-0">A plataforma que reúne tutores, cuidadores e serviços de pets em um só lugar.</p>
                     </div>
-
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <div class="info-box p-3 rounded-3 border bg-white shadow-sm">
-                                <i class="bi bi-clock-history fs-3 text-orange"></i>
-                                <div>
-                                    <strong>Agendamentos ágeis</strong>
-                                    <p class="text-muted mb-0">Marque serviços para seu pet de forma rápida e segura.</p>
-                                </div>
+                    <div class="mt-4">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3 fs-4">🐾</div>
+                            <div>
+                                <strong>Conexões confiáveis</strong>
+                                <p class="mb-0 text-white-75">Encontre cuidadores avaliados para passeios, hospedagens e cuidados diários.</p>
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div class="info-box p-3 rounded-3 border bg-white shadow-sm">
-                                <i class="bi bi-star fs-3 text-orange"></i>
-                                <div>
-                                    <strong>Cuidadores confiáveis</strong>
-                                    <p class="text-muted mb-0">Selecione profissionais com notas e comentários verificados.</p>
-                                </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3 fs-4">📅</div>
+                            <div>
+                                <strong>Agenda simplificada</strong>
+                                <p class="mb-0 text-white-75">Agende serviços e acompanhe confirmações com rapidez e praticidade.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <div class="me-3 fs-4">💬</div>
+                            <div>
+                                <strong>Comunicação direta</strong>
+                                <p class="mb-0 text-white-75">Troque mensagens com cuidadores para organizar tudo com mais segurança.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 hero-visual p-4">
-                    <div class="hero-image-wrap mx-auto position-relative">
-                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80" alt="Pets felizes" class="img-fluid rounded-4 shadow-lg hero-img">
-                        <div class="hero-card mini-card top-card">
-                            <i class="bi bi-chat-left-text-fill text-orange"></i>
-                            <div>
-                                <strong>Feedback real</strong>
-                                <small class="text-muted">Avaliações 5 estrelas de donos satisfeitos.</small>
+                <div class="col-lg-7 p-5">
+                    <div class="mb-4">
+                        <span class="badge badge-soft rounded-pill px-3 py-2 mb-3">Bem-vindo ao PetConnect</span>
+                        <h1 class="h2 fw-semibold">Cuidar do seu pet ficou mais fácil.</h1>
+                        <p class="text-muted">Conecte seu pet com o melhor cuidado em poucos minutos. Descomplique agendamentos, encontre cuidadores confiáveis e gerencie todos os serviços em um único lugar.</p>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="feature-card-modern rounded-4 p-4 h-100">
+                                <div class="mb-3 text-orange fs-3"><i class="bi bi-people-fill"></i></div>
+                                <h3 class="h6">Para tutores</h3>
+                                <p class="text-muted mb-0">Encontre cuidadores confiáveis, agende serviços e acompanhe cada etapa.</p>
                             </div>
                         </div>
-                        <div class="hero-card mini-card bottom-card">
-                            <i class="bi bi-calendar2-check-fill text-orange"></i>
-                            <div>
-                                <strong>Agendamentos flexíveis</strong>
-                                <small class="text-muted">Marque horários conforme sua rotina.</small>
+                        <div class="col-sm-6">
+                            <div class="feature-card-modern rounded-4 p-4 h-100">
+                                <div class="mb-3 text-orange fs-3"><i class="bi bi-briefcase-fill"></i></div>
+                                <h3 class="h6">Para cuidadores</h3>
+                                <p class="text-muted mb-0">Receba pedidos, organize sua agenda e ofereça serviços profissionais.</p>
                             </div>
                         </div>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <a href="{{ route('auth.register') }}" class="btn btn-login btn-lg w-100 w-sm-auto"><i class="bi bi-pencil-square me-2"></i>Cadastrar-se</a>
+                        <a href="{{ route('auth.login') }}" class="btn btn-outline-secondary btn-lg w-100 w-sm-auto"><i class="bi bi-box-arrow-in-right me-2"></i>Entrar</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="features" class="landing-features mt-5">
+        <section id="resources" class="landing-features mt-5 mb-5">
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="feature-card h-100 text-center p-4">
@@ -112,10 +134,29 @@
                 <div class="col-md-4">
                     <div class="feature-card h-100 text-center p-4">
                         <div class="feature-icon bg-orange-soft mb-3">
-                            <i class="bi bi-heart-pulse fs-3 text-orange"></i>
+                            <i class="bi bi-star-fill fs-3 text-orange"></i>
                         </div>
-                        <h3 class="h5">Cuidado transparente</h3>
-                        <p class="text-muted mb-0">Acompanhe pagamentos, histórico e avaliações com clareza.</p>
+                        <h3 class="h5">Avaliações e segurança</h3>
+                        <p class="text-muted mb-0">Avaliações verificadas garantem confiança e qualidade nos serviços.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="why" class="landing-benefits mt-5 mb-5">
+            <div class="row g-4">
+                <div class="col-sm-6">
+                    <div class="feature-card-modern rounded-4 p-4 h-100">
+                        <div class="mb-3 text-orange fs-3"><i class="bi bi-calendar-check-fill"></i></div>
+                        <h3 class="h6">Agendamentos</h3>
+                        <p class="text-muted mb-0">Agende passeios, hospedagens e cuidados em poucos passos, com confirmação rápida.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="feature-card-modern rounded-4 p-4 h-100">
+                        <div class="mb-3 text-orange fs-3"><i class="bi bi-heart-pulse"></i></div>
+                        <h3 class="h6">Cuidado transparente</h3>
+                        <p class="text-muted mb-0">Acompanhe pagamentos, histórico e avaliações com total clareza.</p>
                     </div>
                 </div>
             </div>
@@ -171,8 +212,12 @@
                 </div>
             </div>
         </div>
+
+        <div class="text-center mt-5 text-muted small">PetConnect — Mais atenção, menos preocupações. Seu pet em boas mãos.</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+    
