@@ -18,6 +18,11 @@
         <h5 class="fw-bold mb-1" style="color:#1C1917;">Lista de Agendamentos</h5>
         <p class="text-muted mb-0" style="font-size:0.88rem;">Gerencie todos os agendamentos de serviços.</p>
     </div>
+    @if(auth()->user()->role === 'CLI')
+        <a href="{{ route('agendamentos.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i> Novo Agendamento
+        </a>
+    @endif
 
         <span><i class="bi bi-calendar2-check me-2 text-primary"></i>Agendamentos</span>
         <span class="badge bg-light text-secondary border">{{ count($agendamentos) }} registros</span>

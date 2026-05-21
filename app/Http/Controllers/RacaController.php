@@ -54,4 +54,13 @@ class RacaController extends Controller
         Raca::findOrFail($id)->delete();
         return redirect()->route('racas.index')->with('success', 'Raça removida com sucesso!');
     }
+
+    public function porEspecie($especieId)
+    {
+        $racas = \App\Models\Raca::where('id_especie', $especieId)
+            ->orderBy('nome')
+            ->get(['id', 'nome']);
+
+        return response()->json($racas);
+    }
 }

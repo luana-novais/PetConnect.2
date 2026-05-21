@@ -19,16 +19,15 @@ class Pet extends Model
         'id_raca',
         'peso',
         'sexo',
+        'id_foto',
         'observacoes',
     ];
 
     protected $casts = [
         'data_nascimento' => 'date',
-        'peso' => 'decimal:2',
-        'sexo' => 'string',
+        'peso'            => 'decimal:2',
+        'sexo'            => 'string',
     ];
-
-    // Relacionamentos
 
     public function user()
     {
@@ -45,9 +44,10 @@ class Pet extends Model
         return $this->belongsTo(Raca::class, 'id_raca');
     }
 
-    public function fotos()
+    // foto é um belongsTo: id_foto fica na tabela pets
+    public function foto()
     {
-        return $this->hasMany(FotoPet::class, 'id_pet');
+        return $this->belongsTo(FotoPet::class, 'id_foto');
     }
 
     public function agendamentos()

@@ -1,9 +1,3 @@
-CREATE DATABASE projeto_petConnect
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE projeto_petConnect;
-
 -- tabela usuario
 CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -19,6 +13,7 @@ CREATE TABLE users (
 CREATE TABLE identificacao (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_user BIGINT UNSIGNED NOT NULL,
+    id_foto BIGINT UNSIGNED NOT NULL,
     tipo_documento ENUM('CNPJ','CPF') NOT NULL DEFAULT 'CPF',
     documento VARCHAR(18) UNIQUE,
     created_at TIMESTAMP NULL,
@@ -26,17 +21,22 @@ CREATE TABLE identificacao (
 
     CONSTRAINT fk_identificacao_user
         FOREIGN KEY (id_user) REFERENCES users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+        
+	CONSTRAINT fk_id_fotos
+        FOREIGN KEY (id_foto) REFERENCES fotos(id)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- tabela especie
 CREATE TABLE especie (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tipo_pet ENUM('GATO','CACHORRO','PEQUENOS MAMIFEROS','EXOTICOS') NOT NULL,
+    tipo_pet varchar(255) NOT NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );
-
+alter table especie 
+modify tipo_pet varchar(255) not null;
 -- tabela raca
 CREATE TABLE raca (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -60,6 +60,7 @@ CREATE TABLE pets (
     id_raca BIGINT UNSIGNED NOT NULL,
     peso DECIMAL(5,2),
     sexo ENUM('FEMEA','MACHO') NOT NULL,
+    id_foto BIGINT UNSIGNED NULL,
     observacoes TEXT,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
@@ -74,7 +75,12 @@ CREATE TABLE pets (
 
     CONSTRAINT fk_pets_raca
         FOREIGN KEY (id_raca) REFERENCES raca(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      
+	CONSTRAINT fk_id_foto
+        FOREIGN KEY (id_foto) REFERENCES fotos(id)
         ON UPDATE CASCADE ON DELETE CASCADE
+	
 );
 
 -- tabela serviços
@@ -93,12 +99,18 @@ CREATE TABLE agendamentos (
     id_pet BIGINT UNSIGNED NOT NULL,
     id_user_sitter BIGINT UNSIGNED NOT NULL,
     id_servico BIGINT UNSIGNED NOT NULL,
+    id_foto BIGINT UNSIGNED NULL,
     data_inicio dateTIME,
     data_fim dateTIME,
     status ENUM('pendente','confirmado','cancelado','concluido') DEFAULT 'pendente',
     observacoes TEXT,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
+    
+    
+	CONSTRAINT fk_agendamento_foto
+        FOREIGN KEY (id_foto) REFERENCES fotos(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
 
     CONSTRAINT fk_agendamento_cliente
         FOREIGN KEY (id_user_cliente) REFERENCES users(id)
@@ -181,32 +193,13 @@ CREATE TABLE disponibilidade (
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- tabela fotos pets
-CREATE TABLE fotos_pets (
+-- tabela fotos
+CREATE TABLE fotos (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_pet BIGINT UNSIGNED NOT NULL,
     nome_arquivo VARCHAR(255) NOT NULL,
     url_foto VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL,
-
-    CONSTRAINT fk_fotos_pet
-        FOREIGN KEY (id_pet) REFERENCES pets(id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- tabela fotos usuarios
-CREATE TABLE fotos_usuarios (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_user BIGINT UNSIGNED NOT NULL,
-    nome_arquivo VARCHAR(255) NOT NULL,
-    url_foto VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL,
-
-    CONSTRAINT fk_fotos_user
-        FOREIGN KEY (id_user) REFERENCES users(id)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    updated_at TIMESTAMP NULL
 );
 
 -- tabela telefones
@@ -234,4 +227,20 @@ CREATE TABLE historico_servicos (
     CONSTRAINT fk_historico_agendamento
         FOREIGN KEY (id_agendamento) REFERENCES agendamentos(id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE carteira (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_user BIGINT UNSIGNED,
+    saldo DECIMAL(10,2) DEFAULT 0,
+
+    FOREIGN KEY (id_user) REFERENCES users(id)
+);
+
+CREATE TABLE cashout (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_user BIGINT UNSIGNED,
+    valor DECIMAL(10,2),
+    status ENUM('pendente','aprovado','recusado'),
+    data_solicitacao DATETIME
 );

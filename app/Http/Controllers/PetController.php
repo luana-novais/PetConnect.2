@@ -13,133 +13,143 @@ use Exception;
 
 class PetController extends Controller
 {
-    /**
-     * Lista todos os pets com filtros e paginação.
-     * Rota: GET /pets
-     */
     public function index(Request $request)
     {
-        $pets = Pet::paginate(10);
+        $user = auth()->user();
+
+        if ($user->role === 'ADM') {
+            $pets = Pet::with(['especie', 'raca', 'user'])->paginate(10);
+        } else {
+            // CLI vê apenas os próprios pets
+            $pets = Pet::with(['especie', 'raca', 'user'])
+                ->where('id_user', $user->id)
+                ->paginate(10);
+        }
+
         $especies = Especie::all();
+
         return view('pets.index', compact('pets', 'especies'));
     }
 
-    /**
-     * Exibe o formulário de criação de pet.
-     * Rota: GET /pets/create
-     */
     public function create(Request $request)
     {
         $selectedEspecie = $request->query('id_especie') ?? old('id_especie');
-        $racas = $selectedEspecie ? Raca::where('id_especie', $selectedEspecie)->get() : collect();
-        $especies = Especie::all();
+        $racas           = $selectedEspecie ? Raca::where('id_especie', $selectedEspecie)->get() : collect();
+        $especies        = Especie::all();
 
         return view('pets.create', compact('racas', 'especies', 'selectedEspecie'));
     }
 
-    /**
-     * Salva um novo pet no banco de dados.
-     * Rota: POST /pets
-     */
     public function store(Request $request)
-{
-    $request->validate([
-            'nome' => 'required|max:255',
+    {
+        $request->validate([
+            'nome'            => 'required|max:255',
             'data_nascimento' => 'nullable|date',
-            'id_especie' => 'required',
-            'id_raca' => 'required',
-            'peso' => 'nullable|numeric',
-            'sexo' => 'required|in:MACHO,FEMEA',
-            'observacoes' => 'nullable'
+            'id_especie'      => 'required|exists:especie,id',
+            'id_raca'         => 'required|exists:raca,id',
+            'peso'            => 'nullable|numeric|min:0',
+            'sexo'            => 'required|in:MACHO,FEMEA',
+            'observacoes'     => 'nullable|string|max:1000',
         ]);
 
         try {
-
             Pet::create([
-                'id_user' => auth()->id(),
-                'nome' => $request->nome,
+                'id_user'         => auth()->id(),
+                'nome'            => $request->nome,
                 'data_nascimento' => $request->data_nascimento,
-                'id_especie' => $request->id_especie,
-                'id_raca' => $request->id_raca,
-                'peso' => $request->peso,
-                'sexo' => $request->sexo,
-                'observacoes' => $request->observacoes,
+                'id_especie'      => $request->id_especie,
+                'id_raca'         => $request->id_raca,
+                'peso'            => $request->peso,
+                'sexo'            => $request->sexo,
+                'observacoes'     => $request->observacoes,
             ]);
+        } catch (Exception $e) {
+            Log::error('Erro ao inserir o pet: ' . $e->getMessage(), ['stack' => $e->getTraceAsString()]);
+            return redirect()->back()->withInput()->with('error', 'Erro ao cadastrar o pet.');
+        }
 
-    } catch(Exception $e){
-
-        dd($e->getMessage());
-
-        Log::error('Erro ao inserir o pet: '. $e->getMessage(), [
-            'stack' => $e->getTraceAsString()
-        ]);
-
-        return redirect()->back()
-            ->with('error', 'Erro ao cadastrar o pet.');
+        return redirect()->route('pets.index')->with('success', 'Pet cadastrado com sucesso!');
     }
 
-    return redirect()
-        ->route('pets.index')
-        ->with('success', 'Pet cadastrado com sucesso!');
-}
-
-    /**
-     * Exibe os detalhes de um pet específico.
-     * Rota: GET /pets/{pet}
-     */
     public function show($id)
     {
-        $pet = Pet::findOrFail($id);
-        return view('pets.show',compact('pet'));
+        $pet  = Pet::with(['especie', 'raca'])->findOrFail($id);
+        $user = auth()->user();
 
+        if ($user->role !== 'ADM' && $pet->id_user !== $user->id) {
+            abort(403);
+        }
+
+        return view('pets.show', compact('pet'));
     }
 
-    /**
-     * Exibe o formulário de edição de pet ou processa a atualização.
-     * Rota: GET/POST /pets/{id}/edit
-     */
     public function edit($id)
     {
-        $pet = Pet::findOrFail($id);
-        $users = User::all();
-        $especie = Especie::all();
-        $racas = Raca::all();
+        $pet  = Pet::findOrFail($id);
+        $user = auth()->user();
 
-        return view('pets.edit', compact('pet', 'users', 'especie', 'racas'));
+        if ($user->role !== 'ADM' && $pet->id_user !== $user->id) {
+            abort(403);
+        }
+
+        $especies = Especie::all();
+        $racas    = Raca::where('id_especie', $pet->id_especie)->get();
+
+        // ADM pode reatribuir o pet a outro usuário; CLI não vê esse campo
+        $users = $user->role === 'ADM' ? User::where('role', 'CLI')->get() : collect();
+
+        return view('pets.edit', compact('pet', 'especies', 'racas', 'users'));
     }
 
     public function update(Request $request, $id)
-        {
-            try{
-                $pet = Pet::findOrFail($id);
-                $pet->update($request->all());
-            } catch(Exception $e){
-                Log::error('Erro ao alterar o cadastro: '. $e->getMessage(), [
-                    'stack' => $e->getTraceAsString()
-                ]);
-            }
-            return redirect()->route('pets.index');
+    {
+        $pet  = Pet::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->role !== 'ADM' && $pet->id_user !== $user->id) {
+            abort(403);
         }
 
+        $request->validate([
+            'nome'            => 'required|max:255',
+            'data_nascimento' => 'nullable|date',
+            'id_especie'      => 'required|exists:especie,id',
+            'id_raca'         => 'required|exists:raca,id',
+            'peso'            => 'nullable|numeric|min:0',
+            'sexo'            => 'required|in:MACHO,FEMEA',
+            'observacoes'     => 'nullable|string|max:1000',
+        ]);
 
-    /**
-     * Remove um pet do banco de dados.
-     * Rota: DELETE /pets/{pet}
-     */
+        try {
+            $pet->update($request->only([
+                'nome', 'data_nascimento', 'id_especie',
+                'id_raca', 'peso', 'sexo', 'observacoes',
+            ]));
+        } catch (Exception $e) {
+            Log::error('Erro ao alterar o pet: ' . $e->getMessage(), ['stack' => $e->getTraceAsString()]);
+            return redirect()->back()->withInput()->with('error', 'Erro ao atualizar o pet.');
+        }
+
+        return redirect()->route('pets.index')->with('success', 'Pet atualizado com sucesso!');
+    }
+
     public function destroy(Pet $pet)
     {
-        // Remove fotos associadas do storage, se houver
-        if ($pet->fotos->isNotEmpty()) {
-            foreach ($pet->fotos as $foto) {
-                Storage::disk('public')->delete($foto->url_foto);
-            }
+        $user = auth()->user();
+
+        if ($user->role !== 'ADM' && $pet->id_user !== $user->id) {
+            abort(403);
+        }
+
+        // Remove a foto associada do storage, se houver
+        if ($pet->id_foto && $pet->foto) {
+            Storage::disk('public')->delete($pet->foto->url_foto);
+            $pet->foto()->dissociate();
         }
 
         $nomePet = $pet->nome;
         $pet->delete();
 
-        return redirect()
-            ->route('pets.index')
-            ->with('success', "Pet \"{$nomePet}\" excluído com sucesso.");
+        return redirect()->route('pets.index')->with('success', "Pet \"{$nomePet}\" excluído com sucesso.");
     }
 }

@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PetConnect - @yield('title', 'Painel')</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- CSS Global PetConnect -->
     <link href="{{ asset('app.css') }}" rel="stylesheet">
 
     @stack('styles')
 </head>
 <body>
+
+    @php $role = auth()->user()->role ?? 'CLI'; @endphp
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -25,41 +24,43 @@
         </div>
 
         <nav class="sidebar-nav">
+
+            {{-- ── Principal (todos) ── --}}
             <div class="sidebar-label">Principal</div>
             <a href="{{ route('welcome') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-grid-1x2"></i>
                 <span class="nav-text">Dashboard</span>
             </a>
 
-            <div class="sidebar-label mt-2">Gestão</div>
-            <a href="{{ route('pets.index') }}" class="nav-link {{ request()->is('pets*') ? 'active' : '' }}">
-                <i class="bi bi-heart"></i>
-                <span class="nav-text">Pets</span>
-            </a>
-            <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
-                <i class="bi bi-calendar3"></i>
-                <span class="nav-text">Agendamentos</span>
-            </a>
-            <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
-                <i class="bi bi-scissors"></i>
-                <span class="nav-text">Serviços</span>
-            </a>
-            @if(auth()->user()->role !== 'CLI')
+            {{-- ── ADM ── --}}
+            @if($role === 'ADM')
+                <div class="sidebar-label mt-2">Gestão</div>
+                <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3"></i>
+                    <span class="nav-text">Agendamentos</span>
+                </a>
+                <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
+                    <i class="bi bi-scissors"></i>
+                    <span class="nav-text">Serviços</span>
+                </a>
                 <a href="{{ route('disponibilidades.index') }}" class="nav-link {{ request()->is('disponibilidades*') ? 'active' : '' }}">
                     <i class="bi bi-clock"></i>
                     <span class="nav-text">Disponibilidade</span>
                 </a>
-            @endif
-            <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
-                <i class="bi bi-credit-card"></i>
-                <span class="nav-text">Pagamentos</span>
-            </a>
+                <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-credit-card"></i>
+                    <span class="nav-text">Pagamentos</span>
+                </a>
 
-            <div class="sidebar-label mt-2">Cadastros</div>
-            <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
-                <i class="bi bi-people"></i> Usuários
-            </a>
-            @if(auth()->user()->role === 'ADM')
+                <div class="sidebar-label mt-2">Cadastros</div>
+                <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users*') ? 'active' : '' }}">
+                    <i class="bi bi-people"></i>
+                    <span class="nav-text">Usuários</span>
+                </a>
+                <a href="{{ route('pets.index') }}" class="nav-link {{ request()->is('pets*') ? 'active' : '' }}">
+                    <i class="bi bi-heart"></i>
+                    <span class="nav-text">Pets</span>
+                </a>
                 <a href="{{ route('especies.index') }}" class="nav-link {{ request()->is('especies*') ? 'active' : '' }}">
                     <i class="bi bi-tags"></i>
                     <span class="nav-text">Espécies</span>
@@ -69,6 +70,57 @@
                     <span class="nav-text">Raças</span>
                 </a>
             @endif
+
+            {{-- ── PRO ── --}}
+            @if($role === 'PRO')
+                <div class="sidebar-label mt-2">Meu trabalho</div>
+                <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3"></i>
+                    <span class="nav-text">Agendamentos</span>
+                </a>
+                <a href="{{ route('servicos.index') }}" class="nav-link {{ request()->is('servicos*') ? 'active' : '' }}">
+                    <i class="bi bi-scissors"></i>
+                    <span class="nav-text">Serviços</span>
+                </a>
+                <a href="{{ route('disponibilidades.index') }}" class="nav-link {{ request()->is('disponibilidades*') ? 'active' : '' }}">
+                    <i class="bi bi-clock"></i>
+                    <span class="nav-text">Disponibilidade</span>
+                </a>
+                <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-credit-card"></i>
+                    <span class="nav-text">Pagamentos</span>
+                </a>
+
+                <div class="sidebar-label mt-2">Conta</div>
+                <a href="{{ route('users.edit', auth()->id()) }}" class="nav-link {{ request()->is('users/'.auth()->id().'/edit') ? 'active' : '' }}">
+                    <i class="bi bi-person-gear"></i>
+                    <span class="nav-text">Meu Perfil</span>
+                </a>
+            @endif
+
+            {{-- ── CLI ── --}}
+            @if($role === 'CLI')
+                <div class="sidebar-label mt-2">Minha área</div>
+                <a href="{{ route('pets.index') }}" class="nav-link {{ request()->is('pets*') ? 'active' : '' }}">
+                    <i class="bi bi-heart"></i>
+                    <span class="nav-text">Meus Pets</span>
+                </a>
+                <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3"></i>
+                    <span class="nav-text">Agendamentos</span>
+                </a>
+                <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
+                    <i class="bi bi-credit-card"></i>
+                    <span class="nav-text">Pagamentos</span>
+                </a>
+
+                <div class="sidebar-label mt-2">Conta</div>
+                <a href="{{ route('users.edit', auth()->id()) }}" class="nav-link {{ request()->is('users/'.auth()->id().'/edit') ? 'active' : '' }}">
+                    <i class="bi bi-person-gear"></i>
+                    <span class="nav-text">Meu Perfil</span>
+                </a>
+            @endif
+
         </nav>
 
         <!-- Rodapé do usuário -->
@@ -82,7 +134,10 @@
                         {{ auth()->user()->name ?? 'Usuário' }}
                     </div>
                     <div style="font-size:0.72rem;color:#78716C;">
-                        {{ auth()->user()->role ?? 'CLI' }}
+                        @if($role === 'ADM') Administrador
+                        @elseif($role === 'PRO') Profissional
+                        @else Cliente
+                        @endif
                     </div>
                 </div>
             </div>
@@ -96,7 +151,6 @@
         <!-- Topbar -->
         <div class="topbar">
             <div class="d-flex align-items-center gap-3">
-                <!-- Botão de recolher -->
                 <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle" title="Recolher menu">
                     <i class="bi bi-list fs-5"></i>
                 </button>
@@ -148,7 +202,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -156,7 +209,6 @@
         const mainWrapper = document.getElementById('mainWrapper');
         const toggle      = document.getElementById('sidebarToggle');
 
-        // Recupera estado salvo
         if (localStorage.getItem('sidebarCollapsed') === 'true') {
             sidebar.classList.add('collapsed');
             mainWrapper.classList.add('sidebar-collapsed');

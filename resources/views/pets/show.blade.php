@@ -140,23 +140,17 @@
         </div>
         @endif
 
-        {{-- Fotos --}}
-        @if($pet->fotos->isNotEmpty())
+        {{-- Foto --}}
+        @if($pet->foto)
         <div class="card mb-4">
             <div class="card-header">
-                <i class="bi bi-images me-2 text-warning"></i>Fotos
+                <i class="bi bi-image me-2 text-warning"></i>Foto
             </div>
             <div class="card-body">
-                <div class="row g-2">
-                    @foreach($pet->fotos as $foto)
-                        <div class="col-4 col-md-3">
-                            <img src="{{ $foto->url_foto }}"
-                                 alt="{{ $foto->nome_arquivo }}"
-                                 class="img-fluid rounded"
-                                 style="aspect-ratio:1;object-fit:cover;width:100%;">
-                        </div>
-                    @endforeach
-                </div>
+                <img src="{{ $pet->foto->url_foto }}"
+                     alt="{{ $pet->foto->nome_arquivo }}"
+                     class="img-fluid rounded"
+                     style="max-height:300px;object-fit:cover;">
             </div>
         </div>
         @endif

@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/pets', PetController::class);
     Route::resource('/servicos', ServicoController::class);
     Route::resource('/especies', EspecieController::class);
+    Route::get('/racas/por-especie/{especieId}', [RacaController::class, 'porEspecie'])->name('racas.porEspecie');
     Route::resource('/racas', RacaController::class);
     Route::resource('/users', UserController::class);
     Route::resource('/disponibilidades', DisponibilidadeController::class);

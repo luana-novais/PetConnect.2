@@ -9,18 +9,10 @@ class FotoPet extends Model
 {
     use HasFactory;
 
-    protected $table = 'fotos_pets';
+    protected $table = 'fotos';
 
     protected $fillable = [
-        'id_pet',
         'nome_arquivo',
         'url_foto',
     ];
-
-    // Relacionamentos
-
-    public function pet()
-    {
-        return $this->belongsTo(Pet::class, 'id_pet');
-    }
 }

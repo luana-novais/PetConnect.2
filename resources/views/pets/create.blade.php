@@ -32,9 +32,6 @@
         <form action="{{ route('pets.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Erros gerais --}}
-
-            {{-- Erros gerais --}}
             @if($errors->any())
                 <div class="alert alert-danger d-flex align-items-start gap-2 mb-4">
                     <i class="bi bi-exclamation-triangle-fill mt-1"></i>
@@ -59,37 +56,26 @@
 
                         <div class="col-md-6">
                             <label for="nome" class="form-label">Nome do Pet <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   id="nome"
-                                   name="nome"
+                            <input type="text" id="nome" name="nome"
                                    class="form-control @error('nome') is-invalid @enderror"
                                    value="{{ old('nome') }}"
-                                   placeholder="Ex: Rex, Mia, Bob..."
-                                   required>
-                            @error('nome')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                   placeholder="Ex: Rex, Mia, Bob..." required>
+                            @error('nome')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Dono do Pet</label>
-                            <input type="text"
-                                   class="form-control"
-                                   value="{{ auth()->user()->name }}"
-                                   readonly disabled>
+                            <input type="text" class="form-control"
+                                   value="{{ auth()->user()->name }}" readonly disabled>
                         </div>
 
                         <div class="col-md-6">
                             <label for="data_nascimento" class="form-label">Data de Nascimento</label>
-                            <input type="date"
-                                   id="data_nascimento"
-                                   name="data_nascimento"
+                            <input type="date" id="data_nascimento" name="data_nascimento"
                                    class="form-control @error('data_nascimento') is-invalid @enderror"
                                    value="{{ old('data_nascimento') }}"
                                    max="{{ date('Y-m-d') }}">
-                            @error('data_nascimento')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @error('data_nascimento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="col-md-6">
@@ -100,25 +86,17 @@
                                 <option value="MACHO" {{ old('sexo') === 'MACHO' ? 'selected' : '' }}>Macho</option>
                                 <option value="FEMEA" {{ old('sexo') === 'FEMEA' ? 'selected' : '' }}>Fêmea</option>
                             </select>
-                            @error('sexo')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @error('sexo')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="col-md-4">
                             <label for="peso" class="form-label">Peso (kg)</label>
-                            <input type="number"
-                                   id="peso"
-                                   name="peso"
+                            <input type="number" id="peso" name="peso"
                                    class="form-control @error('peso') is-invalid @enderror"
                                    value="{{ old('peso') }}"
-                                   step="0.01"
-                                   min="0"
-                                   max="999.99"
+                                   step="0.01" min="0" max="999.99"
                                    placeholder="Ex: 4.50">
-                            @error('peso')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @error('peso')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                     </div>
@@ -132,44 +110,29 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-8">
+
+                        <div class="col-md-6">
                             <label for="id_especie" class="form-label">Espécie <span class="text-danger">*</span></label>
                             <select id="id_especie" name="id_especie"
                                     class="form-select @error('id_especie') is-invalid @enderror" required>
                                 <option value="">Selecione a espécie...</option>
                                 @foreach($especies as $especie)
-                                    <option value="{{ $especie->id }}" {{ old('id_especie', $selectedEspecie) == $especie->id ? 'selected' : '' }}>
+                                    <option value="{{ $especie->id }}"
+                                        {{ old('id_especie') == $especie->id ? 'selected' : '' }}>
                                         {{ $especie->tipo_pet }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('id_especie')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-outline-secondary w-100" formaction="{{ route('pets.create') }}" formmethod="GET" formnovalidate>
-                                Filtrar raças
-                            </button>
+                            @error('id_especie')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="col-md-6">
                             <label for="id_raca" class="form-label">Raça <span class="text-danger">*</span></label>
                             <select id="id_raca" name="id_raca"
                                     class="form-select @error('id_raca') is-invalid @enderror" required>
-                                <option value="">Selecione a raça...</option>
-                                @foreach($racas as $raca)
-                                    <option value="{{ $raca->id }}" {{ old('id_raca') == $raca->id ? 'selected' : '' }}>
-                                        {{ $raca->nome }}
-                                    </option>
-                                @endforeach
+                                <option value="">Selecione a espécie primeiro...</option>
                             </select>
-                            @if(!$selectedEspecie)
-                                <div class="form-text text-muted">Selecione a espécie antes de escolher a raça.</div>
-                            @endif
-                            @error('id_raca')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @error('id_raca')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                     </div>
@@ -183,14 +146,11 @@
                 </div>
                 <div class="card-body">
                     <label for="observacoes" class="form-label">Observações</label>
-                    <textarea id="observacoes"
-                              name="observacoes"
+                    <textarea id="observacoes" name="observacoes"
                               class="form-control @error('observacoes') is-invalid @enderror"
                               rows="4"
                               placeholder="Alergias, comportamento, necessidades especiais...">{{ old('observacoes') }}</textarea>
-                    @error('observacoes')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('observacoes')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
             </div>
 
@@ -207,3 +167,49 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    const selectEspecie = document.getElementById('id_especie');
+    const selectRaca    = document.getElementById('id_raca');
+    const oldRacaId     = "{{ old('id_raca') }}";
+
+    function carregarRacas(especieId, racaSelecionada = null) {
+        selectRaca.innerHTML = '<option value="">Carregando raças...</option>';
+        selectRaca.disabled  = true;
+
+        fetch(`/racas/por-especie/${especieId}`)
+            .then(res => res.json())
+            .then(racas => {
+                selectRaca.innerHTML = '<option value="">Selecione a raça...</option>';
+                racas.forEach(raca => {
+                    const opt      = document.createElement('option');
+                    opt.value      = raca.id;
+                    opt.textContent = raca.nome;
+                    if (racaSelecionada && raca.id == racaSelecionada) {
+                        opt.selected = true;
+                    }
+                    selectRaca.appendChild(opt);
+                });
+                selectRaca.disabled = false;
+            })
+            .catch(() => {
+                selectRaca.innerHTML = '<option value="">Erro ao carregar raças</option>';
+                selectRaca.disabled  = false;
+            });
+    }
+
+    selectEspecie.addEventListener('change', function () {
+        if (this.value) {
+            carregarRacas(this.value);
+        } else {
+            selectRaca.innerHTML = '<option value="">Selecione a espécie primeiro...</option>';
+        }
+    });
+
+    // Se voltou com erro de validação, restaura a raça selecionada
+    if (selectEspecie.value && oldRacaId) {
+        carregarRacas(selectEspecie.value, oldRacaId);
+    }
+</script>
+@endpush
