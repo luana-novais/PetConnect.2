@@ -9,9 +9,14 @@ class RoleProMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role != 'PRO') {
+        if (!Auth::check()) {
             return redirect('/login');
         }
+
+        if (Auth::user()->role != 'PRO') {
+            abort(403, 'Acesso restrito a pet sitters.');
+        }
+
         return $next($request);
     }
 }

@@ -1,0 +1,107 @@
+.client-dashboard .client-hero {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffffff 70%);
+    border: 1px solid #fed7aa;
+}
+
+.client-dashboard .client-stat {
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 14px;
+    height: 100%;
+    padding: 1.1rem;
+}
+
+.client-dashboard .client-stat-icon {
+    align-items: center;
+    background: #fff7ed;
+    border-radius: 10px;
+    color: #c2410c;
+    display: inline-flex;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.client-dashboard .client-stat-value {
+    color: #1c1917;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.client-dashboard .client-stat-label {
+    color: #78716c;
+    font-size: .78rem;
+}
+
+.client-dashboard .client-section {
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.client-dashboard .client-section-header {
+    align-items: center;
+    border-bottom: 1px solid #e7e5e4;
+    display: flex;
+    justify-content: space-between;
+    padding: .95rem 1.1rem;
+}
+
+.client-dashboard .client-section-title {
+    color: #292524;
+    font-size: .92rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.client-dashboard .client-row {
+    align-items: center;
+    border-bottom: 1px solid #f5f5f4;
+    display: flex;
+    gap: .75rem;
+    justify-content: space-between;
+    padding: .85rem 1.1rem;
+}
+
+.client-dashboard .client-row:last-child {
+    border-bottom: 0;
+}
+
+.client-dashboard .client-row-title {
+    color: #292524;
+    font-size: .84rem;
+    font-weight: 700;
+}
+
+.client-dashboard .client-row-meta {
+    color: #78716c;
+    font-size: .76rem;
+}
+
+.client-dashboard .client-action {
+    align-items: center;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    color: #c2410c;
+    display: flex;
+    font-size: .8rem;
+    font-weight: 600;
+    gap: .45rem;
+    padding: .65rem .8rem;
+    text-decoration: none;
+}
+
+.client-dashboard .client-action:hover {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+@media (max-width: 575.98px) {
+    .client-dashboard .client-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

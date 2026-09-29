@@ -6,6 +6,7 @@ use App\Models\Pet;
 use App\Models\Especie;
 use App\Models\Raca;
 use App\Models\User;
+use App\Models\FotoPet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -18,10 +19,10 @@ class PetController extends Controller
         $user = auth()->user();
 
         if ($user->role === 'ADM') {
-            $pets = Pet::with(['especie', 'raca', 'user'])->paginate(10);
+            $pets = Pet::with(['especie', 'raca', 'user', 'fotos', 'foto'])->paginate(10);
         } else {
             // CLI vê apenas os próprios pets
-            $pets = Pet::with(['especie', 'raca', 'user'])
+            $pets = Pet::with(['especie', 'raca', 'user', 'fotos', 'foto'])
                 ->where('id_user', $user->id)
                 ->paginate(10);
         }
@@ -50,10 +51,12 @@ class PetController extends Controller
             'peso'            => 'nullable|numeric|min:0',
             'sexo'            => 'required|in:MACHO,FEMEA',
             'observacoes'     => 'nullable|string|max:1000',
+            'fotos'           => 'nullable|array|max:10',
+            'fotos.*'         => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         try {
-            Pet::create([
+            $pet = Pet::create([
                 'id_user'         => auth()->id(),
                 'nome'            => $request->nome,
                 'data_nascimento' => $request->data_nascimento,
@@ -63,6 +66,14 @@ class PetController extends Controller
                 'sexo'            => $request->sexo,
                 'observacoes'     => $request->observacoes,
             ]);
+
+            foreach ($request->file('fotos', []) as $arquivo) {
+                FotoPet::create([
+                    'id_pet' => $pet->id,
+                    'nome_arquivo' => $arquivo->getClientOriginalName(),
+                    'url_foto' => $arquivo->store('fotos/pets', 'public'),
+                ]);
+            }
         } catch (Exception $e) {
             Log::error('Erro ao inserir o pet: ' . $e->getMessage(), ['stack' => $e->getTraceAsString()]);
             return redirect()->back()->withInput()->with('error', 'Erro ao cadastrar o pet.');
@@ -73,14 +84,19 @@ class PetController extends Controller
 
     public function show($id)
     {
-        $pet  = Pet::with(['especie', 'raca'])->findOrFail($id);
+        $pet  = Pet::with(['especie', 'raca', 'fotos', 'foto', 'user', 'agendamentos'])->findOrFail($id);
         $user = auth()->user();
 
         if ($user->role !== 'ADM' && $pet->id_user !== $user->id) {
             abort(403);
         }
 
-        return view('pets.show', compact('pet'));
+        $fotos = $pet->fotos;
+        if ($pet->foto && !$fotos->contains('id', $pet->foto->id)) {
+            $fotos->prepend($pet->foto);
+        }
+
+        return view('pets.show', compact('pet', 'fotos'));
     }
 
     public function edit($id)
@@ -118,6 +134,8 @@ class PetController extends Controller
             'peso'            => 'nullable|numeric|min:0',
             'sexo'            => 'required|in:MACHO,FEMEA',
             'observacoes'     => 'nullable|string|max:1000',
+            'fotos'           => 'nullable|array|max:10',
+            'fotos.*'         => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         try {
@@ -125,6 +143,14 @@ class PetController extends Controller
                 'nome', 'data_nascimento', 'id_especie',
                 'id_raca', 'peso', 'sexo', 'observacoes',
             ]));
+
+            foreach ($request->file('fotos', []) as $arquivo) {
+                FotoPet::create([
+                    'id_pet' => $pet->id,
+                    'nome_arquivo' => $arquivo->getClientOriginalName(),
+                    'url_foto' => $arquivo->store('fotos/pets', 'public'),
+                ]);
+            }
         } catch (Exception $e) {
             Log::error('Erro ao alterar o pet: ' . $e->getMessage(), ['stack' => $e->getTraceAsString()]);
             return redirect()->back()->withInput()->with('error', 'Erro ao atualizar o pet.');
@@ -141,9 +167,14 @@ class PetController extends Controller
             abort(403);
         }
 
-        // Remove a foto associada do storage, se houver
+        foreach ($pet->fotos as $foto) {
+            Storage::disk('public')->delete($foto->url_foto);
+            $foto->delete();
+        }
+
         if ($pet->id_foto && $pet->foto) {
             Storage::disk('public')->delete($pet->foto->url_foto);
+            $pet->foto->delete();
             $pet->foto()->dissociate();
         }
 

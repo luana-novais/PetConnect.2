@@ -10,11 +10,15 @@ use App\Models\Disponibilidade;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\FotoPet;
 
 class AgendamentoController extends Controller
 {
     public function index()
     {
+        $this->concluirAgendamentosExpirados();
+
         if (auth()->user()->role === 'ADM') {
             $agendamentos = Agendamento::with(['cliente','pet','sitter','servico','pagamento'])->get();
         } elseif (auth()->user()->role === 'CLI') {
@@ -45,6 +49,27 @@ class AgendamentoController extends Controller
         $agendamento->update(['status' => 'confirmado']);
 
         return redirect()->back()->with('success', 'Agendamento confirmado com sucesso!');
+    }
+
+    public function complete($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+
+        if (auth()->user()->role !== 'PRO' || $agendamento->id_user_sitter !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($agendamento->status !== Agendamento::STATUS_CONFIRMADO) {
+            return redirect()->back()->with('error', 'Apenas agendamentos confirmados podem ser concluídos.');
+        }
+
+        if (!$agendamento->data_fim || Carbon::parse($agendamento->data_fim)->isFuture()) {
+            return redirect()->back()->with('error', 'O atendimento ainda não terminou.');
+        }
+
+        $agendamento->update(['status' => Agendamento::STATUS_CONCLUIDO]);
+
+        return redirect()->back()->with('success', 'Atendimento concluído com sucesso!');
     }
 
     public function create()
@@ -176,7 +201,8 @@ class AgendamentoController extends Controller
 
     public function show($id)
     {
-        $agendamento = Agendamento::with(['cliente', 'pet', 'sitter', 'servico'])->findOrFail($id);
+        $this->concluirAgendamentosExpirados();
+        $agendamento = Agendamento::with(['cliente', 'pet', 'sitter', 'servico', 'avaliacoes.user', 'fotos'])->findOrFail($id);
 
         $user = auth()->user();
         if (
@@ -190,9 +216,50 @@ class AgendamentoController extends Controller
         return view('agendamentos.show', compact('agendamento'));
     }
 
+    public function uploadFotos(Request $request, $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+
+        if (auth()->user()->role !== 'PRO' || $agendamento->id_user_sitter !== auth()->id()) {
+            abort(403);
+        }
+
+        if (!in_array($agendamento->status, [Agendamento::STATUS_CONFIRMADO, Agendamento::STATUS_CONCLUIDO], true)) {
+            return back()->with('error', 'As fotos só podem ser adicionadas durante um atendimento confirmado ou concluído.');
+        }
+
+        $request->validate([
+            'fotos' => 'required|array|max:10',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'fotos.required' => 'Selecione pelo menos uma foto.',
+            'fotos.max' => 'Você pode enviar no máximo 10 fotos por vez.',
+            'fotos.*.image' => 'Todos os arquivos devem ser imagens.',
+            'fotos.*.mimes' => 'As fotos devem estar nos formatos JPG, PNG ou WEBP.',
+            'fotos.*.max' => 'Cada foto pode ter no máximo 5 MB.',
+        ]);
+
+        foreach ($request->file('fotos', []) as $arquivo) {
+            FotoPet::create([
+                'id_user' => auth()->id(),
+                'id_pet' => $agendamento->id_pet,
+                'id_agendamento' => $agendamento->id,
+                'nome_arquivo' => $arquivo->getClientOriginalName(),
+                'url_foto' => $arquivo->store('fotos/atendimentos', 'public'),
+            ]);
+        }
+
+        return back()->with('success', 'Fotos do atendimento enviadas com sucesso!');
+    }
+
     public function edit($id)
     {
         $agendamento = Agendamento::findOrFail($id);
+
+        if ($agendamento->status === Agendamento::STATUS_CONCLUIDO) {
+            return redirect()->route('agendamentos.show', $agendamento->id)
+                ->with('error', 'Agendamentos finalizados não podem ser alterados.');
+        }
 
         $user = auth()->user();
         if (
@@ -222,6 +289,11 @@ class AgendamentoController extends Controller
     public function update(Request $request, $id)
     {
         $agendamento = Agendamento::findOrFail($id);
+
+        if ($agendamento->status === Agendamento::STATUS_CONCLUIDO) {
+            return redirect()->route('agendamentos.show', $agendamento->id)
+                ->with('error', 'Agendamentos finalizados não podem ser alterados.');
+        }
 
         $user = auth()->user();
         if (
@@ -334,6 +406,14 @@ class AgendamentoController extends Controller
             ->where('hora_inicio', '<=', $inicio->format('H:i'))
             ->where('hora_fim', '>=', $fim->format('H:i'))
             ->exists();
+    }
+
+    private function concluirAgendamentosExpirados(): void
+    {
+        Agendamento::whereNotIn('status', [Agendamento::STATUS_CANCELADO, Agendamento::STATUS_CONCLUIDO])
+            ->whereNotNull('data_fim')
+            ->where('data_fim', '<=', now())
+            ->update(['status' => Agendamento::STATUS_CONCLUIDO]);
     }
 
     /**

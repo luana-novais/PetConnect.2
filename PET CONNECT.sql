@@ -1,3 +1,9 @@
+CREATE DATABASE projeto_petConnect
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE projeto_petConnect;
+
 -- tabela usuario
 CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -134,7 +140,7 @@ CREATE TABLE pagamentos (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_agendamento BIGINT UNSIGNED,
     total_servico DECIMAL(10,2),
-    metodo_pagamento ENUM('pix','cartao','dinheiro'),
+    metodo_pagamento ENUM('pix','cartao_credito','cartao_debito','boleto'),
     status_pagamento ENUM('pendente','pago','estornado'),
     data_pagamento DATETIME,
     created_at TIMESTAMP NULL,

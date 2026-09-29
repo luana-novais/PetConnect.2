@@ -65,7 +65,68 @@
     </div>
 </div>
 
-{{-- Tabela --}}
+@if(auth()->user()->role === 'CLI')
+    @if($pets->isEmpty())
+        <div class="text-center py-5">
+            <div style="font-size:3rem;">🐾</div>
+            <p class="text-muted mt-2 mb-3">Nenhum pet cadastrado ainda.</p>
+            <a href="{{ route('pets.create') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i> Cadastrar primeiro pet
+            </a>
+        </div>
+    @else
+        <div class="pet-client-list">
+            @foreach($pets as $pet)
+                @php $fotoPrincipal = $pet->fotos->first() ?? $pet->foto; @endphp
+                <article class="pet-client-card">
+                    @if($fotoPrincipal)
+                        <img src="{{ asset('storage/' . $fotoPrincipal->url_foto) }}"
+                             alt="Foto de {{ $pet->nome }}" class="pet-client-avatar">
+                    @else
+                        <span class="pet-client-avatar pet-client-avatar-fallback">
+                            {{ strtoupper(substr($pet->nome, 0, 1)) }}
+                        </span>
+                    @endif
+
+                    <div class="pet-client-body">
+                        <div class="pet-client-title-row">
+                            <div>
+                                <h6 class="pet-client-title">{{ $pet->nome }}</h6>
+                                <span class="pet-client-subtitle">{{ $pet->especie->tipo_pet }} · {{ $pet->raca->nome }}</span>
+                            </div>
+                            <span class="pet-client-sex {{ strtolower($pet->sexo) }}">
+                                <i class="bi {{ $pet->sexo === 'MACHO' ? 'bi-gender-male' : 'bi-gender-female' }}"></i>
+                                {{ $pet->sexo === 'MACHO' ? 'Macho' : 'Fêmea' }}
+                            </span>
+                        </div>
+                        <div class="pet-client-meta">
+                            <span><i class="bi bi-calendar3"></i>{{ $pet->data_nascimento?->format('d/m/Y') ?? 'Nascimento não informado' }}</span>
+                            <span><i class="bi bi-speedometer2"></i>{{ $pet->peso ? number_format($pet->peso, 2, ',', '.') . ' kg' : 'Peso não informado' }}</span>
+                            <span><i class="bi bi-images"></i>{{ $pet->fotos->count() + ($pet->foto && !$pet->fotos->contains('id', $pet->foto->id) ? 1 : 0) }} foto(s)</span>
+                        </div>
+                    </div>
+
+                    <div class="pet-client-actions">
+                        <a href="{{ route('pets.show', $pet->id) }}" class="btn btn-ghost btn-sm">
+                            <i class="bi bi-eye me-1"></i> Ver detalhes
+                        </a>
+                        <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-sm pet-edit-button">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        @if($pets->hasPages())
+            <div class="d-flex justify-content-between align-items-center px-3 py-3 border-top">
+                <span class="text-muted" style="font-size:0.82rem;">Mostrando {{ $pets->firstItem() }}–{{ $pets->lastItem() }} de {{ $pets->total() }} registros</span>
+                {{ $pets->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+    @endif
+@else
+{{-- Tabela administrativa --}}
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-heart me-2 text-warning"></i>Pets Cadastrados</span>
@@ -85,7 +146,6 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Pet</th>
                             <th>Espécie / Raça</th>
                             <th>Dono</th>
@@ -97,9 +157,22 @@
                     </thead>
                     <tbody>
                         @foreach($pets as $pet)
+                        @php $fotoPrincipal = $pet->fotos->first() ?? $pet->foto; @endphp
                         <tr>
-                            <td>{{ $pet->id }}</td>
-                            <td>{{ $pet->nome }}</td>
+                            <td>
+                                <div class="pet-list-name">
+                                    @if($fotoPrincipal)
+                                        <img src="{{ asset('storage/' . $fotoPrincipal->url_foto) }}"
+                                             alt="Foto de {{ $pet->nome }}"
+                                             class="pet-list-avatar">
+                                    @else
+                                        <span class="pet-list-avatar pet-list-avatar-fallback">
+                                            {{ strtoupper(substr($pet->nome, 0, 1)) }}
+                                        </span>
+                                    @endif
+                                    <span class="fw-semibold">{{ $pet->nome }}</span>
+                                </div>
+                            </td>
                             <td>{{ $pet->especie->tipo_pet }} / {{ $pet->raca->nome }}</td>
                             <td>{{ $pet->user->name }}</td>
                             <td>{{ $pet->data_nascimento ? $pet->data_nascimento->format('d/m/Y') : '—' }}</td>
@@ -127,5 +200,6 @@
         @endif
     </div>
 </div>
+@endif
 
 @endsection

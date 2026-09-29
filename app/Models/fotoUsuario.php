@@ -12,6 +12,8 @@ class FotoUsuario extends Model
     protected $table = 'fotos';
 
     protected $fillable = [
+        'id_user',
+        'id_agendamento',
         'nome_arquivo',
         'url_foto',
     ];

@@ -66,10 +66,10 @@
 
                         <div class="col-md-6">
                             <label for="valor_servico" class="form-label">Valor do Serviço <span class="text-danger">*</span></label>
-                            <input type="text" step="0.01" id="valor_servico" name="valor_servico" class="form-control @error('valor') is-invalid @enderror"
-                                   value="{{ old('valor') }}" placeholder="Insira o valor"
+                            <input type="number" step="0.01" min="0" id="valor_servico" name="valor_servico" class="form-control @error('valor_servico') is-invalid @enderror"
+                                value="{{ old('valor_servico') }}" placeholder="Insira o valor"
                                    required>
-                            @error('nome')
+                            @error('valor_servico')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

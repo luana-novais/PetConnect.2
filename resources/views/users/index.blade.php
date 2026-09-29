@@ -3,6 +3,10 @@
 @section('title', 'Usuários')
 @section('page-title', 'Usuários')
 
+@push('styles')
+    <link href="{{ asset('css/users/index.css') }}" rel="stylesheet">
+@endpush
+
 @section('breadcrumb')
     <li class="breadcrumb-item active">Usuários</li>
 @endsection
@@ -39,9 +43,7 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Email</th>
+                                <th>Usuário</th>
                                 <th>Perfil</th>
                                 <th>Telefone</th>
                                 <th>Ações</th>
@@ -50,10 +52,27 @@
                         <tbody>
                             @foreach($users as $user)
                                 <tr>
-                                    <td>{{ $user->id }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->role }}</td>
+                                    <td>
+                                        <div class="user-list-name">
+                                            @if($user->fotoUsuario)
+                                                <img src="{{ asset('storage/' . $user->fotoUsuario->url_foto) }}"
+                                                     alt="Foto de {{ $user->name }}" class="user-list-avatar">
+                                            @else
+                                                <span class="user-list-avatar user-list-avatar-fallback">
+                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                </span>
+                                            @endif
+                                            <div>
+                                                <div class="fw-semibold">{{ $user->name }}</div>
+                                                <small class="text-muted">{{ $user->email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="user-role-badge user-role-{{ strtolower($user->role) }}">
+                                            {{ $user->role === 'ADM' ? 'Administrador' : ($user->role === 'PRO' ? 'Profissional' : 'Cliente') }}
+                                        </span>
+                                    </td>
                                     <td>{{ $user->telefone->numero ?? '—' }}</td>
                                     <td class="d-flex gap-2">
                                         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">Editar</a>
@@ -97,10 +116,17 @@
 
                     {{-- Avatar + Nome --}}
                     <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
-                             style="width:48px;height:48px;background:#FDE8DC;color:#C44A14;font-size:18px;">
-                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                        </div>
+                        @if($user->fotoUsuario)
+                            <img src="{{ asset('storage/' . $user->fotoUsuario->url_foto) }}"
+                                 alt="Foto de {{ $user->name }}"
+                                 class="rounded-circle flex-shrink-0"
+                                 style="width:48px;height:48px;object-fit:cover;">
+                        @else
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                                 style="width:48px;height:48px;background:#FDE8DC;color:#C44A14;font-size:18px;">
+                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </div>
+                        @endif
                         <div>
                             <div class="fw-semibold">{{ $user->name }}</div>
                             <div class="text-muted" style="font-size:.85rem;">{{ $user->email }}</div>
@@ -108,10 +134,6 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="text-muted mb-1" style="font-size:.78rem;">ID</div>
-                            <div class="fw-semibold">#{{ $user->id }}</div>
-                        </div>
                         <div class="col-md-6">
                             <div class="text-muted mb-1" style="font-size:.78rem;">Nome</div>
                             <div class="fw-semibold">{{ $user->name }}</div>

@@ -16,7 +16,8 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="pet-detail-page">
+<div class="d-flex justify-content-between align-items-center mb-4 pet-detail-heading">
     <div>
         <h5 class="fw-bold mb-1" style="color:#1C1917;">Detalhes do Pet</h5>
         <p class="text-muted mb-0" style="font-size:0.88rem;">Informações completas de {{ $pet->nome }}.</p>
@@ -35,15 +36,21 @@
 
     {{-- Card principal --}}
     <div class="col-lg-4">
-        <div class="card h-100">
+        <div class="card h-100 pet-profile-card">
             <div class="card-body text-center py-4">
 
-                {{-- Avatar grande --}}
-                <div class="pet-avatar-lg">
-                    {{ $pet->especie->tipo_pet === 'GATO' ? '🐱' : ($pet->especie->tipo_pet === 'CACHORRO' ? '🐶' : '🐾') }}
-                </div>
+                {{-- Foto principal ou avatar padrão --}}
+                @if($fotos->isNotEmpty())
+                    <img src="{{ asset('storage/' . $fotos->first()->url_foto) }}"
+                         alt="Foto de {{ $pet->nome }}" class="pet-avatar-lg pet-avatar-image">
+                @else
+                    <div class="pet-avatar-lg">
+                        {{ $pet->especie->tipo_pet === 'GATO' ? '🐱' : ($pet->especie->tipo_pet === 'CACHORRO' ? '🐶' : '🐾') }}
+                    </div>
+                @endif
 
-                <h4 class="fw-bold mb-1" style="color:#1C1917;">{{ $pet->nome }}</h4>
+                <h1 class="pet-name">{{ $pet->nome }}</h1>
+                <div class="pet-type-label">{{ $pet->especie->tipo_pet }} · {{ $pet->raca->nome }}</div>
 
                 <div class="mb-3">
                     @if($pet->sexo === 'MACHO')
@@ -53,7 +60,7 @@
                     @endif
                 </div>
 
-                <div class="d-flex justify-content-center gap-3 mb-4">
+                <div class="d-flex justify-content-center gap-3 mb-4 pet-species-stats">
                     <div class="text-center">
                         <div class="fw-bold" style="color:#1C1917;">{{ $pet->especie->tipo_pet }}</div>
                         <div class="text-muted" style="font-size:0.78rem;">Espécie</div>
@@ -65,7 +72,7 @@
                     </div>
                 </div>
 
-                <hr class="my-3">
+                <hr class="my-3 pet-rule">
 
                 {{-- Dono --}}
                 <div class="owner-card">
@@ -86,7 +93,7 @@
     <div class="col-lg-8">
 
         {{-- Dados físicos --}}
-        <div class="card mb-4">
+        <div class="card mb-4 pet-detail-card">
             <div class="card-header">
                 <i class="bi bi-clipboard2-data me-2 text-warning"></i>Dados Físicos
             </div>
@@ -130,7 +137,7 @@
 
         {{-- Observações --}}
         @if($pet->observacoes)
-        <div class="card mb-4">
+        <div class="card mb-4 pet-detail-card pet-notes-card">
             <div class="card-header">
                 <i class="bi bi-journal-text me-2 text-warning"></i>Observações
             </div>
@@ -140,23 +147,30 @@
         </div>
         @endif
 
-        {{-- Foto --}}
-        @if($pet->foto)
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-image me-2 text-warning"></i>Foto
+        {{-- Fotos --}}
+        @if($fotos->isNotEmpty())
+        <div class="card mb-4 pet-detail-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-images me-2 text-warning"></i>Fotos do Pet</span>
+                <span class="pet-gallery-count">{{ $fotos->count() }}</span>
             </div>
-            <div class="card-body">
-                <img src="{{ $pet->foto->url_foto }}"
-                     alt="{{ $pet->foto->nome_arquivo }}"
-                     class="img-fluid rounded"
-                     style="max-height:300px;object-fit:cover;">
+            <div class="card-body pet-gallery-body">
+                <div class="row g-3 pet-gallery">
+                    @foreach($fotos as $foto)
+                        <div class="col-sm-6 col-md-4 pet-gallery-item">
+                            <img src="{{ asset('storage/' . $foto->url_foto) }}"
+                                 alt="{{ $foto->nome_arquivo }}"
+                                 class="img-fluid rounded w-100"
+                                 loading="lazy">
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
         @endif
 
         {{-- Histórico de agendamentos --}}
-        <div class="card">
+        <div class="card pet-detail-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-calendar3 me-2 text-warning"></i>Últimos Agendamentos</span>
                 <span class="badge bg-light text-secondary border">{{ $pet->agendamentos->count() }}</span>
@@ -219,6 +233,8 @@
             </button>
         </form>
     </div>
+</div>
+
 </div>
 
 @endsection

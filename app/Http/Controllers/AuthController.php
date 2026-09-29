@@ -8,6 +8,8 @@ use App\Models\Endereco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use App\Models\FotoUsuario;
 
 class AuthController extends Controller
 {
@@ -67,12 +69,13 @@ class AuthController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
-            'role'     => 'required|in:ADM,CLI,PRO',
+            'role'     => 'required|in:CLI,PRO',
             'numero'   => 'nullable|string|max:20',
             'endereco' => 'nullable|string|max:255',
             'cidade'   => 'nullable|string|max:100',
             'estado'   => 'nullable|string|max:100',
             'cep'      => 'nullable|string|max:10',
+            'foto'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ], [
             'name.required'      => 'O nome é obrigatório.',
             'email.required'     => 'O email é obrigatório.',
@@ -105,6 +108,15 @@ class AuthController extends Controller
                 'cidade'   => $request->cidade,
                 'estado'   => $request->estado,
                 'cep'      => $request->cep,
+            ]);
+        }
+
+        if ($request->hasFile('foto')) {
+            $arquivo = $request->file('foto');
+            FotoUsuario::create([
+                'id_user' => $user->id,
+                'nome_arquivo' => $arquivo->getClientOriginalName(),
+                'url_foto' => $arquivo->store('fotos/usuarios', 'public'),
             ]);
         }
 

@@ -105,6 +105,10 @@
                     <i class="bi bi-heart"></i>
                     <span class="nav-text">Meus Pets</span>
                 </a>
+                <a href="{{ route('sitters.index') }}" class="nav-link {{ request()->is('sitters*') ? 'active' : '' }}">
+                    <i class="bi bi-person-hearts"></i>
+                    <span class="nav-text">Sitters</span>
+                </a>
                 <a href="{{ route('agendamentos.index') }}" class="nav-link {{ request()->is('agendamentos*') ? 'active' : '' }}">
                     <i class="bi bi-calendar3"></i>
                     <span class="nav-text">Agendamentos</span>

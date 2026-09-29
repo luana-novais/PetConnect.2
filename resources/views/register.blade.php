@@ -61,7 +61,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('auth.register.store') }}" method="POST">
+                <form action="{{ route('auth.register.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     {{-- ── Dados da conta ── --}}
@@ -159,6 +159,14 @@
                                placeholder="(11) 99999-9999"
                                value="{{ old('numero') }}">
                         @error('numero')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto" class="form-label"><i class="bi bi-camera me-1"></i>Foto do usuário</label>
+                        <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp"
+                               class="form-control @error('foto') is-invalid @enderror">
+                        <small class="text-muted">JPG, PNG ou WEBP, até 5 MB.</small>
+                        @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- ── Endereço ── --}}

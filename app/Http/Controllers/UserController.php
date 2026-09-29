@@ -8,6 +8,8 @@ use App\Models\Endereco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use App\Models\FotoUsuario;
 use Exception;
 
 class UserController extends Controller
@@ -15,11 +17,11 @@ class UserController extends Controller
     public function index()
     {
         if (auth()->user()->role === 'ADM') {
-            $users = User::with(['telefone', 'endereco'])->get();
+            $users = User::with(['telefone', 'endereco', 'fotoUsuario'])->get();
         } else {
             // Não-ADM vê apenas o próprio perfil; envolve em coleção
             // para que a view use sempre $users com @foreach
-            $users = User::with(['telefone', 'endereco'])
+            $users = User::with(['telefone', 'endereco', 'fotoUsuario'])
                 ->where('id', auth()->id())
                 ->get();
         }
@@ -44,6 +46,7 @@ class UserController extends Controller
             'cidade'   => 'nullable|string|max:100',
             'estado'   => 'nullable|string|max:100',
             'cep'      => 'nullable|string|max:10',
+            'foto'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         try {
@@ -68,6 +71,15 @@ class UserController extends Controller
                     'cidade'   => $request->cidade,
                     'estado'   => $request->estado,
                     'cep'      => $request->cep,
+                ]);
+            }
+
+            if ($request->hasFile('foto')) {
+                $arquivo = $request->file('foto');
+                FotoUsuario::create([
+                    'id_user' => $user->id,
+                    'nome_arquivo' => $arquivo->getClientOriginalName(),
+                    'url_foto' => $arquivo->store('fotos/usuarios', 'public'),
                 ]);
             }
 
@@ -98,10 +110,6 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'CLI') {
-            abort(403);
-        }
-
         if ($user->role !== 'ADM' && $user->id !== (int) $id) {
             abort(403);
         }
@@ -117,7 +125,7 @@ class UserController extends Controller
     {
         $authUser = auth()->user();
 
-        if ($authUser->role === 'CLI' || ($authUser->role !== 'ADM' && $authUser->id !== (int) $id)) {
+        if ($authUser->role !== 'ADM' && $authUser->id !== (int) $id) {
             abort(403);
         }
 
@@ -131,6 +139,7 @@ class UserController extends Controller
             'cep'              => 'nullable|string|max:10',
             'current_password' => 'nullable',
             'password'         => 'nullable|min:8|confirmed',
+            'foto'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         try {
@@ -140,6 +149,21 @@ class UserController extends Controller
                 'name'  => $request->name,
                 'email' => $request->email,
             ]);
+
+            if ($request->hasFile('foto')) {
+                $fotoAntiga = $user->fotosUsuarios()->latest()->first();
+                $arquivo = $request->file('foto');
+                $fotoNova = FotoUsuario::create([
+                    'id_user' => $user->id,
+                    'nome_arquivo' => $arquivo->getClientOriginalName(),
+                    'url_foto' => $arquivo->store('fotos/usuarios', 'public'),
+                ]);
+
+                if ($fotoAntiga) {
+                    Storage::disk('public')->delete($fotoAntiga->url_foto);
+                    $fotoAntiga->delete();
+                }
+            }
 
             if ($request->filled('current_password')) {
                 if (!Hash::check($request->current_password, $user->password)) {

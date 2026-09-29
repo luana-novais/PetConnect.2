@@ -9,12 +9,19 @@ use Exception;
 
 class DisponibilidadeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // PRO vê só suas disponibilidades
-        $disponibilidades = auth()->user()->role === 'ADM'
-            ? Disponibilidade::with('user')->paginate(10)
-            : Disponibilidade::where('id_user', auth()->id())->with('user')->paginate(10);
+        $query = Disponibilidade::with('user');
+
+        if (auth()->user()->role !== 'ADM') {
+            $query->where('id_user', auth()->id());
+        }
+
+        if ($request->filled('dia_semana')) {
+            $query->where('dia_semana', $request->dia_semana);
+        }
+
+        $disponibilidades = $query->paginate(10)->withQueryString();
 
         return view('disponibilidades.index', compact('disponibilidades'));
     }
@@ -30,6 +37,13 @@ class DisponibilidadeController extends Controller
             'dia_semana' => 'required|string',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fim' => 'required|date_format:H:i|after:hora_inicio',
+        ], [
+            'dia_semana.required' => 'Selecione um dia da semana.',
+            'hora_inicio.required' => 'Informe o horário de início.',
+            'hora_inicio.date_format' => 'O horário de início deve estar no formato HH:MM.',
+            'hora_fim.required' => 'Informe o horário de término.',
+            'hora_fim.date_format' => 'O horário de término deve estar no formato HH:MM.',
+            'hora_fim.after' => 'O horário de término deve ser depois do horário de início.',
         ]);
 
         $data = $request->only(['dia_semana', 'hora_inicio', 'hora_fim']);
@@ -65,6 +79,13 @@ class DisponibilidadeController extends Controller
             'dia_semana' => 'required|string',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fim' => 'required|date_format:H:i|after:hora_inicio',
+        ], [
+            'dia_semana.required' => 'Selecione um dia da semana.',
+            'hora_inicio.required' => 'Informe o horário de início.',
+            'hora_inicio.date_format' => 'O horário de início deve estar no formato HH:MM.',
+            'hora_fim.required' => 'Informe o horário de término.',
+            'hora_fim.date_format' => 'O horário de término deve estar no formato HH:MM.',
+            'hora_fim.after' => 'O horário de término deve ser depois do horário de início.',
         ]);
 
         try {

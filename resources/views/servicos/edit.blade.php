@@ -52,7 +52,8 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Valor do Serviço</label>
-                            <input type="text" name="valor_servico" class="form-control" value="{{ old('valor_servico', $servicos->valor_servico) }}" required>
+                            <input type="number" step="0.01" min="0" name="valor_servico" class="form-control @error('valor_servico') is-invalid @enderror" value="{{ old('valor_servico', $servicos->valor_servico) }}" required>
+                            @error('valor_servico')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
 

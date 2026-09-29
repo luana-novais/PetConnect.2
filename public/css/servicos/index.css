@@ -1,0 +1,134 @@
+.service-list-header {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem 1rem 0 0;
+    display: flex;
+    font-weight: 700;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+}
+
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    margin-top: .85rem;
+}
+
+.service-card {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem;
+    display: flex;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    transition: box-shadow .2s, transform .2s;
+}
+
+.service-card:hover {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .07);
+    transform: translateY(-1px);
+}
+
+.service-icon {
+    align-items: center;
+    background: #fff7ed;
+    border-radius: 50%;
+    color: #c2410c;
+    display: flex;
+    flex-shrink: 0;
+    font-size: 1.3rem;
+    height: 52px;
+    justify-content: center;
+    width: 52px;
+}
+
+.service-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.service-heading {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: space-between;
+}
+
+.service-title {
+    color: #1c1917;
+    font-size: .98rem;
+    font-weight: 700;
+    margin: 0 0 .15rem;
+}
+
+.service-subtitle,
+.service-meta {
+    color: #78716c;
+    font-size: .82rem;
+}
+
+.service-price {
+    color: #166534;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.service-meta {
+    margin-top: .55rem;
+}
+
+.service-meta i {
+    color: #a8a29e;
+}
+
+.service-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: .4rem;
+}
+
+.service-actions .btn {
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+.service-view-button {
+    border: 1px solid #e7e5e4;
+    color: #57534e;
+}
+
+.service-edit-button {
+    background: #fff7ed;
+    border: 1px solid #fddcb5;
+    color: #c2410c;
+}
+
+.service-empty {
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 0 0 1rem 1rem;
+    padding: 3.5rem 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .service-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .service-body {
+        width: calc(100% - 68px);
+    }
+
+    .service-actions {
+        width: 100%;
+    }
+
+    .service-actions .btn {
+        flex: 1;
+    }
+}

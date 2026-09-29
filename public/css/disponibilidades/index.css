@@ -1,0 +1,138 @@
+.availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+}
+
+.availability-card {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem;
+    display: flex;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    transition: box-shadow .2s, transform .2s;
+}
+
+.availability-card:hover {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .07);
+    transform: translateY(-1px);
+}
+
+.availability-icon {
+    align-items: center;
+    background: #fff7ed;
+    border-radius: 50%;
+    color: #c2410c;
+    display: flex;
+    flex-shrink: 0;
+    font-size: 1.3rem;
+    height: 52px;
+    justify-content: center;
+    width: 52px;
+}
+
+.availability-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.availability-heading {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: space-between;
+}
+
+.availability-day {
+    color: #1c1917;
+    font-size: .98rem;
+    font-weight: 700;
+    margin: 0 0 .15rem;
+}
+
+.availability-owner {
+    color: #78716c;
+    font-size: .82rem;
+}
+
+.availability-status {
+    color: #15803d;
+    font-size: .76rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.availability-time {
+    align-items: center;
+    color: #57534e;
+    display: flex;
+    font-size: .86rem;
+    gap: .4rem;
+    margin-top: .6rem;
+}
+
+.availability-time i {
+    color: #a8a29e;
+}
+
+.availability-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: .4rem;
+}
+
+.availability-actions .btn {
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+.availability-edit-button {
+    background: #fff7ed;
+    border: 1px solid #fddcb5;
+    color: #c2410c;
+}
+
+.availability-delete-button {
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.availability-empty {
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 1rem;
+    padding: 3.5rem 1.5rem;
+}
+
+.availability-empty-icon {
+    color: #f59e0b;
+    font-size: 2.5rem;
+    margin-bottom: .75rem;
+}
+
+@media (max-width: 768px) {
+    .availability-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .availability-body {
+        width: calc(100% - 68px);
+    }
+
+    .availability-actions {
+        width: 100%;
+    }
+
+    .availability-actions .btn,
+    .availability-actions form {
+        flex: 1;
+    }
+
+    .availability-actions form button {
+        width: 100%;
+    }
+}

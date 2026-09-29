@@ -12,6 +12,9 @@ class FotoPet extends Model
     protected $table = 'fotos';
 
     protected $fillable = [
+        'id_user',
+        'id_pet',
+        'id_agendamento',
         'nome_arquivo',
         'url_foto',
     ];

@@ -3,9 +3,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Especie;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EspecieController extends Controller
+class EspecieController extends Controller implements HasMiddleware
 {
+    /**
+     * Somente o administrador pode incluir, alterar ou excluir espécies (F_B03).
+     * A listagem (index) fica liberada para qualquer usuário autenticado,
+     * pois é usada em telas de cadastro de pet por tutores e pet sitters.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('role.adm', except: ['index', 'show']),
+        ];
+    }
+
     public function index()
     {
         $especies = Especie::all();

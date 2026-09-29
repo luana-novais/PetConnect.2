@@ -72,10 +72,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(Disponibilidade::class, 'id_user');
     }
+
+    public function servicos()
+    {
+        return $this->hasMany(Servico::class, 'id_user');
+    }
  
     public function fotosUsuarios()
     {
-        return $this->hasMany(FotoUsuario::class, 'id_user');
+        return $this->hasMany(FotoUsuario::class, 'id_user')
+            ->whereNull('id_agendamento');
+    }
+
+    public function fotoUsuario()
+    {
+        return $this->hasOne(FotoUsuario::class, 'id_user')
+            ->ofMany(['id' => 'max'], function ($query) {
+                $query->whereNull('id_agendamento');
+            });
     }
  
     public function agendamentosComoCliente()
@@ -91,5 +105,17 @@ class User extends Authenticatable
     public function avaliacoes()
     {
         return $this->hasMany(Avaliacao::class, 'id_user');
+    }
+
+    public function avaliacoesRecebidas()
+    {
+        return $this->hasManyThrough(
+            Avaliacao::class,
+            Agendamento::class,
+            'id_user_sitter',
+            'id_agendamento',
+            'id',
+            'id'
+        );
     }
 }

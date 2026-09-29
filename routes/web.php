@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DisponibilidadeController;
 use App\Http\Controllers\EspecieController;
 use App\Http\Controllers\RacaController;
+use App\Http\Controllers\SitterController;
 
 // Rotas de Autenticação (sem middleware de autenticação)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/racas', RacaController::class);
     Route::resource('/users', UserController::class);
     Route::resource('/disponibilidades', DisponibilidadeController::class);
+    Route::get('/sitters', [SitterController::class, 'index'])->name('sitters.index');
 
     // Rotas AJAX de agendamento — DEVEM vir antes do resource para não
     // serem interceptadas como {agendamento} pelo Laravel
@@ -39,6 +41,8 @@ Route::middleware('auth')->group(function () {
     // Ações personalizadas de agendamento
     Route::put('/agendamentos/{id}/cancel', [AgendamentoController::class, 'cancel'])->name('agendamentos.cancel');
     Route::put('/agendamentos/{id}/confirm', [AgendamentoController::class, 'confirm'])->name('agendamentos.confirm');
+    Route::put('/agendamentos/{id}/complete', [AgendamentoController::class, 'complete'])->name('agendamentos.complete');
+    Route::post('/agendamentos/{id}/fotos', [AgendamentoController::class, 'uploadFotos'])->name('agendamentos.fotos');
 
     Route::resource('/agendamentos', AgendamentoController::class);
 

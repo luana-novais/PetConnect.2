@@ -50,6 +50,11 @@ class Pet extends Model
         return $this->belongsTo(FotoPet::class, 'id_foto');
     }
 
+    public function fotos()
+    {
+        return $this->hasMany(FotoPet::class, 'id_pet')->whereNull('id_agendamento');
+    }
+
     public function agendamentos()
     {
         return $this->hasMany(Agendamento::class, 'id_pet');

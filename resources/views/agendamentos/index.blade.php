@@ -89,7 +89,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-1" style="color:#1C1917;">Meus Agendamentos</h5>
+        <h5 class="fw-bold mb-1" style="color:#1C1917;">
+            {{ auth()->user()->role === 'ADM' ? 'Gerenciar Agendamentos' : 'Meus Agendamentos' }}
+        </h5>
         <p class="text-muted mb-0" style="font-size:.88rem;">
             {{ count($agendamentos) }} agendamento{{ count($agendamentos) !== 1 ? 's' : '' }} encontrado{{ count($agendamentos) !== 1 ? 's' : '' }}
         </p>
@@ -144,6 +146,11 @@
         $canEdit   = $ag->status === 'pendente';
         $canCancel = !in_array($ag->status, ['cancelado', 'concluido']);
         $canConfirm = auth()->user()->role === 'PRO' && $ag->status === 'pendente';
+        $canComplete = auth()->user()->role === 'PRO'
+            && $ag->id_user_sitter === auth()->id()
+            && $ag->status === 'confirmado'
+            && $ag->data_fim
+            && !\Carbon\Carbon::parse($ag->data_fim)->isFuture();
         $canPay    = auth()->user()->role === 'CLI' && $ag->status === 'confirmado' && !$ag->pagamento;
     @endphp
 
@@ -217,7 +224,7 @@
                 <i class="bi bi-eye me-1"></i> Ver detalhes
             </a>
 
-            @if($canEdit)
+            @if($canEdit && $ag->status !== 'concluido')
                 <a href="{{ route('agendamentos.edit', $ag->id) }}"
                    class="btn btn-sm w-100"
                    style="background:#FFF7ED;color:var(--pet-primary);border:1px solid #FDDCB5;">
@@ -231,6 +238,16 @@
                     <button type="submit" class="btn btn-sm btn-success w-100"
                             onclick="return confirm('Confirmar este agendamento?')">
                         <i class="bi bi-check-lg me-1"></i> Confirmar
+                    </button>
+                </form>
+            @endif
+
+            @if($canComplete)
+                <form method="POST" action="{{ route('agendamentos.complete', $ag->id) }}" class="w-100">
+                    @csrf @method('PUT')
+                    <button type="submit" class="btn btn-sm btn-success w-100"
+                            onclick="return confirm('Marcar este atendimento como concluído?')">
+                        <i class="bi bi-check2-all me-1"></i> Concluir atendimento
                     </button>
                 </form>
             @endif

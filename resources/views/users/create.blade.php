@@ -33,7 +33,7 @@
             </div>
         @endif
 
-        <form action="{{ route('users.store') }}" method="POST" class="card">
+        <form action="{{ route('users.store') }}" method="POST" class="card" enctype="multipart/form-data">
             @csrf
 
             <div class="card-header">
@@ -54,6 +54,15 @@
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="foto" class="form-label">Foto do usuário</label>
+                        <input type="file" class="form-control @error('foto') is-invalid @enderror"
+                               id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
+                        @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
 

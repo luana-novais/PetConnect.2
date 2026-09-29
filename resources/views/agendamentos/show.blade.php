@@ -22,9 +22,11 @@
         <p class="text-muted mb-0" style="font-size:0.88rem;">Informações do agendamento do pet {{ $agendamento->pet->nome }}.</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-pencil me-1"></i> Editar
-        </a>
+        @if($agendamento->status !== 'concluido')
+            <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+        @endif
         <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Voltar
         </a>
@@ -186,6 +188,16 @@
                     </form>
                 @endif
 
+                @if(auth()->user()->role === 'PRO' && $agendamento->status === 'confirmado' && $agendamento->id_user_sitter === auth()->id() && $agendamento->data_fim && !\Carbon\Carbon::parse($agendamento->data_fim)->isFuture())
+                    <form action="{{ route('agendamentos.complete', $agendamento->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Marcar este atendimento como concluído?')">
+                            <i class="bi bi-check2-all me-1"></i> Concluir Atendimento
+                        </button>
+                    </form>
+                @endif
+
                 {{-- Cancelar Agendamento (F_F04) --}}
                 @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
@@ -194,10 +206,16 @@
                 @endif
 
                 {{-- Avaliar Usuário (F_F05) --}}
-                @if($agendamento->status === 'concluido' && auth()->user()->role === 'CLI')
+                @if($agendamento->status === 'concluido' && auth()->user()->role === 'CLI' && $agendamento->id_user_cliente === auth()->id() && $agendamento->avaliacoes->isEmpty())
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#avaliacaoModal">
                         <i class="bi bi-star-fill me-1"></i> Deixar Avaliação
                     </button>
+                @endif
+
+                @if($agendamento->status === 'concluido' && $agendamento->avaliacoes->isNotEmpty())
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle me-1"></i> Avaliação enviada.
+                    </div>
                 @endif
 
                 {{-- Botão Editar --}}
@@ -211,6 +229,75 @@
     </div>
 
 </div>
+
+@if(auth()->user()->role === 'PRO' && $agendamento->id_user_sitter === auth()->id() && in_array($agendamento->status, ['confirmado', 'concluido']))
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-camera me-2 text-warning"></i>Fotos do atendimento
+        </div>
+        <div class="card-body">
+            <form action="{{ route('agendamentos.fotos', $agendamento->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <label for="fotos-atendimento" class="form-label">Adicionar fotos tiradas durante o atendimento</label>
+                <input type="file" id="fotos-atendimento" name="fotos[]" multiple
+                       accept="image/jpeg,image/png,image/webp"
+                       class="form-control @error('fotos') is-invalid @enderror @error('fotos.*') is-invalid @enderror">
+                <div class="form-text">JPG, PNG ou WEBP, até 5 MB cada. Você pode selecionar várias fotos.</div>
+                @error('fotos')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                @error('fotos.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <button type="submit" class="btn btn-primary btn-sm mt-3">
+                    <i class="bi bi-upload me-1"></i> Enviar fotos
+                </button>
+            </form>
+        </div>
+    </div>
+@endif
+
+@if($agendamento->fotos->isNotEmpty())
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-images me-2 text-warning"></i>Fotos do atendimento
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                @foreach($agendamento->fotos as $foto)
+                    <div class="col-6 col-md-3">
+                        <img src="{{ asset('storage/' . $foto->url_foto) }}"
+                             alt="{{ $foto->nome_arquivo }}"
+                             class="img-fluid rounded w-100"
+                             style="aspect-ratio: 1; object-fit: cover;">
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+@endif
+
+@if($agendamento->avaliacoes->isNotEmpty())
+    @php $avaliacao = $agendamento->avaliacoes->first(); @endphp
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-star-fill me-2 text-warning"></i>Avaliação do atendimento
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                <div>
+                    <div class="fw-semibold">{{ $avaliacao->user->name ?? $agendamento->cliente->name }}</div>
+                    <div class="text-muted" style="font-size:.82rem;">Avaliação enviada pelo cliente</div>
+                </div>
+                <div class="text-warning" aria-label="Nota {{ (int) $avaliacao->nota }} de 5">
+                    @for($estrela = 1; $estrela <= 5; $estrela++)
+                        <i class="bi {{ $estrela <= (int) $avaliacao->nota ? 'bi-star-fill' : 'bi-star' }}"></i>
+                    @endfor
+                    <span class="text-dark ms-1 fw-semibold">{{ (int) $avaliacao->nota }}/5</span>
+                </div>
+            </div>
+            @if($avaliacao->comentarios)
+                <p class="mb-0 mt-3" style="color:#44403C;line-height:1.7;">{{ $avaliacao->comentarios }}</p>
+            @endif
+        </div>
+    </div>
+@endif
 
 {{-- MODAL: Cancelar Agendamento (F_F04) --}}
 <div class="modal fade" id="cancelModal" tabindex="-1">
@@ -260,7 +347,6 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Avaliação para: <strong>{{ $agendamento->sitter->name }}</strong></label>
-                        <input type="hidden" name="id_user" value="{{ $agendamento->id_user_sitter }}">
                         <input type="hidden" name="id_agendamento" value="{{ $agendamento->id }}">
                     </div>
 

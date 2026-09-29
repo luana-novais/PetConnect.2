@@ -154,6 +154,18 @@
                 </div>
             </div>
 
+            <div class="card mb-4">
+                <div class="card-header"><i class="bi bi-camera me-2 text-warning"></i>Foto do Pet</div>
+                <div class="card-body">
+                          <label for="fotos" class="form-label">Escolha as imagens</label>
+                          <input type="file" id="fotos" name="fotos[]" accept="image/jpeg,image/png,image/webp"
+                              class="form-control @error('fotos.*') is-invalid @enderror" multiple>
+                          <div class="form-text">Você pode selecionar várias imagens JPG, PNG ou WEBP, até 5 MB cada.</div>
+                          @error('fotos')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                          @error('fotos.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
             {{-- Botões --}}
             <div class="d-flex justify-content-end gap-2">
                 <a href="{{ route('pets.index') }}" class="btn btn-outline-secondary px-4">Cancelar</a>

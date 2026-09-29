@@ -15,9 +15,14 @@ class RoleCliMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role != 'CLI'){
+        if (!Auth::check()) {
             return redirect('/login');
         }
+
+        if (Auth::user()->role != 'CLI') {
+            abort(403, 'Acesso restrito a clientes.');
+        }
+
         return $next($request);
     }
 }

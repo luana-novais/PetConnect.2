@@ -15,9 +15,14 @@ class RoleAdmMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role != 'ADM'){
+        if (!Auth::check()) {
             return redirect('/login');
         }
+
+        if (Auth::user()->role != 'ADM') {
+            abort(403, 'Acesso restrito a administradores.');
+        }
+
         return $next($request);
     }
 }

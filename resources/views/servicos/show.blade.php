@@ -20,9 +20,11 @@
                 <p class="text-muted mb-0" style="font-size:0.88rem;">Informações completas de {{ $servicos->nome }}.</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="{{ route('servicos.edit', $servicos->id) }}" class="btn btn-primary btn-sm">
-                    <i class="bi bi-pencil me-1"></i> Editar
-                </a>
+                @if(auth()->user()->role === 'PRO')
+                    <a href="{{ route('servicos.edit', $servicos->id) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                @endif
                 <a href="{{ route('servicos.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i> Voltar
                 </a>
@@ -35,10 +37,6 @@
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>ID:</strong>
-                        <p class="mb-0">{{ $servicos->id }}</p>
-                    </div>
                     <div class="col-md-6">
                         <strong>Nome:</strong>
                         <p class="mb-0">{{ $servicos->nome }}</p>
@@ -58,16 +56,18 @@
             </div>
         </div>
 
-        <div class="d-flex gap-2 justify-content-end">
-            <button type="button" class="btn btn-danger" onclick="if(confirm('Tem certeza que deseja excluir?')) { document.getElementById('deleteForm').submit(); }">
-                <i class="bi bi-trash me-1"></i> Excluir
-            </button>
-        </div>
+        @if(auth()->user()->role === 'PRO')
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-danger" onclick="if(confirm('Tem certeza que deseja excluir?')) { document.getElementById('deleteForm').submit(); }">
+                    <i class="bi bi-trash me-1"></i> Excluir
+                </button>
+            </div>
 
-        <form id="deleteForm" action="{{ route('servicos.destroy', $servicos->id) }}" method="POST" style="display:none;">
-            @csrf
-            @method('DELETE')
-        </form>
+            <form id="deleteForm" action="{{ route('servicos.destroy', $servicos->id) }}" method="POST" style="display:none;">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endif
     </div>
 </div>
 

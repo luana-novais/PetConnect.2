@@ -13,7 +13,7 @@
 <div class="row justify-content-center">
     <div class="col-xl-8 col-lg-10">
 
-        <form action="{{ route('users.update', $user->id) }}" method="POST">
+        <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -74,6 +74,13 @@
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                    value="{{ old('email', $user->email) }}" placeholder="seuemail@exemplo.com">
                             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size:.78rem;" for="foto">Foto do usuário</label>
+                            <input type="file" name="foto" id="foto" accept="image/jpeg,image/png,image/webp"
+                                   class="form-control @error('foto') is-invalid @enderror">
+                            <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
+                            @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
 

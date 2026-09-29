@@ -72,6 +72,11 @@ class Agendamento extends Model
         return $this->hasMany(Avaliacao::class, 'id_agendamento');
     }
 
+    public function fotos()
+    {
+        return $this->hasMany(FotoPet::class, 'id_agendamento');
+    }
+
     public function historicoServicos()
     {
         return $this->hasMany(HistoricoServico::class, 'id_agendamento');

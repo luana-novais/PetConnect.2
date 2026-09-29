@@ -13,14 +13,14 @@ class PagamentoController extends Controller
         $user = auth()->user();
 
         if ($user->role === 'ADM') {
-            $pagamentos = Pagamento::with(['agendamento'])->get();
+            $pagamentos = Pagamento::with(['agendamento.servico', 'agendamento.cliente', 'agendamento.pet'])->get();
         } elseif ($user->role === 'CLI') {
-            $pagamentos = Pagamento::with(['agendamento'])
+            $pagamentos = Pagamento::with(['agendamento.servico', 'agendamento.cliente', 'agendamento.pet'])
                 ->whereHas('agendamento', fn ($q) => $q->where('id_user_cliente', $user->id))
                 ->get();
         } else {
             // PRO vê pagamentos dos seus agendamentos
-            $pagamentos = Pagamento::with(['agendamento'])
+            $pagamentos = Pagamento::with(['agendamento.servico', 'agendamento.cliente', 'agendamento.pet'])
                 ->whereHas('agendamento', fn ($q) => $q->where('id_user_sitter', $user->id))
                 ->get();
         }

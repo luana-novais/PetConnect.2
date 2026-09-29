@@ -14,8 +14,19 @@ class ServicoController extends Controller
      * Rota: GET /servicos
      */
     public function index(Request $request)
-    { 
-        $servicos = Servico::paginate(10);
+    {
+        $user = auth()->user();
+        $query = Servico::query();
+
+        if ($user->role === 'PRO') {
+            $query->where('id_user', $user->id);
+        }
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        $servicos = $query->with('user')->latest()->paginate(10)->withQueryString();
         return view('servicos.index',compact('servicos'));
     }
 
@@ -25,6 +36,11 @@ class ServicoController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if ($user->role !== 'PRO') {
+            abort(403, 'Somente pet sitters podem cadastrar serviços.');
+        }
+
         $servicos = Servico::all();
         return view('servicos.create', compact('servicos'));
     }
@@ -35,8 +51,21 @@ class ServicoController extends Controller
      */
     public function store(Request $request)
     {
-        try{
-            Servico::create($request->all());
+        $user = auth()->user();
+        if ($user->role !== 'PRO') {
+            abort(403, 'Somente pet sitters podem cadastrar serviços.');
+        }
+
+        $data = $request->validate([
+            'nome' => 'required|string|max:255',
+            'valor_servico' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // Um pet sitter só pode cadastrar serviço em nome dele mesmo;
+            // apenas o administrador pode escolher outro dono.
+            $data['id_user'] = $user->id;
+            Servico::create($data);
         }catch(Exception $e){
             Log::error('Erro ao inserir serviço: '. $e->getMessage(),
             [ 'stack' => $e->getTraceAsString()]);
@@ -51,6 +80,12 @@ class ServicoController extends Controller
     public function show($id)
     {
         $servicos = Servico::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->role !== 'ADM' && $servicos->id_user !== $user->id) {
+            abort(403, 'Você só pode consultar os próprios serviços.');
+        }
+
         return view('servicos.show',compact('servicos'));
     }
 
@@ -61,14 +96,31 @@ class ServicoController extends Controller
     public function edit($id)
     {
         $servicos = Servico::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->role !== 'PRO' || $servicos->id_user !== $user->id) {
+            abort(403, 'Você só pode editar os próprios serviços.');
+        }
+
         return view('servicos.edit', compact('servicos'));
     }
 
     public function update(Request $request, $id)
         {
-            try{
-                $servicos = Servico::findOrFail($id);
-                $servicos->update($request->all());
+            $servicos = Servico::findOrFail($id);
+            $user = auth()->user();
+
+            if ($user->role !== 'PRO' || $servicos->id_user !== $user->id) {
+                abort(403, 'Você só pode editar os próprios serviços.');
+            }
+
+            $data = $request->validate([
+                'nome' => 'required|string|max:255',
+                'valor_servico' => 'required|numeric|min:0',
+            ]);
+
+            try {
+                $servicos->update($data);
             } catch(Exception $e){
                 Log::error('Erro ao alterar o cadastro: '. $e->getMessage(), [
                     'stack' => $e->getTraceAsString()
@@ -82,8 +134,13 @@ class ServicoController extends Controller
      */
     public function destroy($id)
     {
-
         $servicos = Servico::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->role !== 'PRO' || $servicos->id_user !== $user->id) {
+            abort(403, 'Você só pode excluir os próprios serviços.');
+        }
+
         $servicos->delete();
 
         return redirect()
