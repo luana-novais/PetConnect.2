@@ -37,33 +37,41 @@
             @csrf
 
             <div class="card-header">
-                <h6 class="mb-0">Dados Pessoais</h6>
+                <h6 class="mb-0">Dados da conta</h6>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="name" class="form-label">Nome Completo <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">Nome completo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <label for="email" class="form-label">E-mail <span class="text-danger">*</span></label>
                         <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="foto" class="form-label">Foto do usuário</label>
-                        <input type="file" class="form-control @error('foto') is-invalid @enderror"
-                               id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
-                        <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
-                        @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
+
+                <div class="mb-3">
+                    <label class="form-label">Perfil <span class="text-danger">*</span></label>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="role_cli" value="CLI" {{ old('role') === 'CLI' ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="role_cli">Cliente</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="role_pro" value="PRO" {{ old('role') === 'PRO' ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="role_pro">Profissional</label>
+                        </div>
                     </div>
+                    @error('role')
+                        <div class="text-danger small mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="row mb-3">
@@ -75,25 +83,25 @@
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="role" class="form-label">Perfil <span class="text-danger">*</span></label>
-                        <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
-                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>Selecione um perfil</option>
-                            <option value="ADM" {{ old('role') === 'ADM' ? 'selected' : '' }}>Administrador</option>
-                            <option value="PRO" {{ old('role') === 'PRO' ? 'selected' : '' }}>Profissional</option>
-                            <option value="CLI" {{ old('role') === 'CLI' ? 'selected' : '' }}>Cliente</option>
-                        </select>
-                        @error('role')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="password_confirmation" class="form-label">Confirmar senha <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                     </div>
                 </div>
+
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="numero" class="form-label">Telefone <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('numero') is-invalid @enderror" id="numero" name="numero" value="{{ old('numero') }}" placeholder="(11) 98765-4321" required>
+                        <label for="numero" class="form-label">Telefone</label>
+                        <input type="text" class="form-control @error('numero') is-invalid @enderror" id="numero" name="numero" value="{{ old('numero') }}" placeholder="(11) 98765-4321">
                         @error('numero')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label for="foto" class="form-label">Foto do usuário</label>
+                        <input type="file" class="form-control @error('foto') is-invalid @enderror"
+                               id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
+                        @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
@@ -104,8 +112,8 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-12">
-                        <label for="endereco" class="form-label">Endereço <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('endereco') is-invalid @enderror" id="endereco" name="endereco" value="{{ old('endereco') }}" placeholder="Rua, número, complemento" required>
+                        <label for="endereco" class="form-label">Endereço</label>
+                        <input type="text" class="form-control @error('endereco') is-invalid @enderror" id="endereco" name="endereco" value="{{ old('endereco') }}" placeholder="Rua, número">
                         @error('endereco')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -113,23 +121,33 @@
                 </div>
 
                 <div class="row mb-3">
+                    <div class="col-12">
+                        <label for="complemento" class="form-label">Complemento</label>
+                        <input type="text" class="form-control @error('complemento') is-invalid @enderror" id="complemento" name="complemento" value="{{ old('complemento') }}" placeholder="Apartamento, Bloco, Casa, etc.">
+                        @error('complemento')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="cidade" class="form-label">Cidade <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('cidade') is-invalid @enderror" id="cidade" name="cidade" value="{{ old('cidade') }}" required>
+                        <label for="cidade" class="form-label">Cidade</label>
+                        <input type="text" class="form-control @error('cidade') is-invalid @enderror" id="cidade" name="cidade" value="{{ old('cidade') }}">
                         @error('cidade')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-3">
-                        <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('estado') is-invalid @enderror" id="estado" name="estado" value="{{ old('estado') }}" maxlength="2" placeholder="SP" required>
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="text" class="form-control @error('estado') is-invalid @enderror" id="estado" name="estado" value="{{ old('estado') }}" maxlength="2" placeholder="SP">
                         @error('estado')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-3">
-                        <label for="cep" class="form-label">CEP <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('cep') is-invalid @enderror" id="cep" name="cep" value="{{ old('cep') }}" placeholder="12345-678" required>
+                        <label for="cep" class="form-label">CEP</label>
+                        <input type="text" class="form-control @error('cep') is-invalid @enderror" id="cep" name="cep" value="{{ old('cep') }}" placeholder="12345-678">
                         @error('cep')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

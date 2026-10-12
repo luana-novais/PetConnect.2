@@ -66,9 +66,71 @@
 
         .availability-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
             margin-top: 15px;
+        }
+
+        .calendar-day {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--pet-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .calendar-day.selected {
+            border-color: var(--pet-primary);
+            background: rgba(var(--pet-primary-rgb), 0.08);
+            box-shadow: inset 0 0 0 1px rgba(var(--pet-primary-rgb), 0.2);
+        }
+
+        .calendar-day small {
+            display: block;
+            color: #6c757d;
+        }
+
+        .calendar-day strong {
+            color: var(--pet-primary);
+            display: block;
+            margin-top: 4px;
+            font-size: 1.05rem;
+        }
+
+        .slot-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .slot-button {
+            background: white;
+            border: 1px solid #d9dfe4;
+            border-radius: 999px;
+            color: #374151;
+            font-weight: 600;
+            min-width: 100px;
+            padding: 8px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .slot-button:hover {
+            border-color: var(--pet-primary);
+            color: var(--pet-primary);
+        }
+
+        .slot-button.selected {
+            background: var(--pet-primary);
+            border-color: var(--pet-primary);
+            color: white;
         }
 
         .availability-item {
@@ -200,7 +262,7 @@
                             <label for="id_pet" class="form-label">Pet <span class="text-danger">*</span></label>
                             <select id="id_pet" name="id_pet" onchange="onPetSelected()"
                                     class="form-select @error('id_pet') is-invalid @enderror" required>
-                                <option value="">Selecione um pet...</option>
+                                <option value="">Selecione o pet...</option>
                                 @foreach($pets as $pet)
                                     <option value="{{ $pet->id }}" {{ old('id_pet') == $pet->id ? 'selected' : '' }}>
                                         {{ $pet->nome }} - {{ $pet->especie->tipo_pet ?? 'N/A' }}
@@ -233,7 +295,7 @@
                                     class="form-select @error('id_servico') is-invalid @enderror" required>
                                 <option value="">Selecione um serviço...</option>
                                 @foreach($servicos as $servico)
-                                    <option value="{{ $servico->id }}" {{ old('id_servico') == $servico->id ? 'selected' : '' }}>
+                                    <option value="{{ $servico->id }}" data-duracao="{{ $servico->duracao_minutos ?? 60 }}" {{ old('id_servico') == $servico->id ? 'selected' : '' }}>
                                         {{ $servico->nome }} - R$ {{ number_format($servico->valor_servico, 2, ',', '.') }}
                                     </option>
                                 @endforeach
@@ -246,51 +308,12 @@
                 </div>
             </div>
 
-            {{-- PASSO 3: Buscar Sitters Disponíveis na Região --}}
-            <div class="card mb-4" id="searchSitterCard" style="display: none;">
-                <div class="card-header">
-                    <div class="step-indicator">
-                        <div class="step-circle" id="step3-circle">3</div>
-                        <div>
-                            <i class="bi bi-geo-alt me-2 text-success"></i>Buscar Pet Sitters Disponíveis
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="search-section">
-                        <p class="text-muted mb-3">Encontre pet sitters disponíveis na sua região:</p>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="search_cidade" class="form-label">Cidade</label>
-                                <input type="text" id="search_cidade" class="form-control" placeholder="Digite a cidade...">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="search_estado" class="form-label">Estado</label>
-                                <input type="text" id="search_estado" class="form-control" placeholder="Digite o estado (ex: SP)...">
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary mt-3" id="btnSearchSitters">
-                            <i class="bi bi-search me-2"></i>Buscar Sitters
-                            <span class="loading-spinner" id="searchSpinner">
-                                <i class="bi bi-hourglass-split ms-2"></i>
-                            </span>
-                        </button>
-                    </div>
-
-                    {{-- Resultados de busca --}}
-                    <div class="search-results-container" id="searchResults" style="display: none;">
-                        <div id="sittersList"></div>
-                    </div>
-
-                    {{-- Mensagem de nenhum resultado --}}
-                    <div id="noResults" class="no-results" style="display: none;">
-                        Nenhum sitter encontrado. Tente outra localização.
-                    </div>
-
-                    {{-- Sitter selecionado (hidden select) --}}
-                    <input type="hidden" id="id_user_sitter" name="id_user_sitter" value="{{ old('id_user_sitter') }}">
-                </div>
-            </div>
+            {{-- Sitter selecionado na rota anterior --}}
+            <input type="hidden"
+                   id="id_user_sitter"
+                   name="id_user_sitter"
+                   value="{{ old('id_user_sitter', request('sitter_id', $selectedSitter?->id)) }}"
+                   data-sitter-name="{{ old('sitter_name', $selectedSitter?->name ?? '') }}">
 
             {{-- PASSO 4: Verificar Disponibilidade do Sitter (F_F03) --}}
             <div class="card mb-4" id="availabilityCard" style="display: none;">
@@ -304,8 +327,9 @@
                 </div>
                 <div class="card-body">
                     <div class="availability-section">
-                        <h6 class="mb-3">Agenda semanal do sitter:</h6>
+                        <h6 class="mb-3">Selecione uma data e um horário disponível:</h6>
                         <div class="availability-grid" id="availabilityGrid"></div>
+                        <div id="slotContainer" class="slot-grid" style="display: none;"></div>
                         <div id="noAvailability" class="no-availability" style="display: none;">
                             Este sitter não possui disponibilidade cadastrada.
                         </div>
@@ -390,10 +414,10 @@
 
             {{-- Botões de ação --}}
             <div class="d-flex gap-2" id="submitButtons" style="display: none;">
-                <button type="submit" class="btn btn-success btn-lg">
+                <button type="submit" class="btn btn-success btn-sm px-4 py-2">
                     <i class="bi bi-check-lg me-1"></i> Confirmar Agendamento
                 </button>
-                <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-secondary btn-lg">
+                <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-secondary btn-sm px-4 py-2">
                     <i class="bi bi-x-lg me-1"></i> Cancelar
                 </a>
             </div>
@@ -405,27 +429,19 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const btnSearch = document.getElementById('btnSearchSitters');
-    const searchCidade = document.getElementById('search_cidade');
-    const searchEstado = document.getElementById('search_estado');
-    const sittersList = document.getElementById('sittersList');
-    const searchResults = document.getElementById('searchResults');
-    const noResults = document.getElementById('noResults');
-    const searchSpinner = document.getElementById('searchSpinner');
     const sitterInput = document.getElementById('id_user_sitter');
     const availabilityCard = document.getElementById('availabilityCard');
+    let selectedServiceDuration = 60;
     const dateTimeCard = document.getElementById('dateTimeCard');
     const confirmCard = document.getElementById('confirmCard');
     const submitButtons = document.getElementById('submitButtons');
     const availabilityGrid = document.getElementById('availabilityGrid');
     const noAvailability = document.getElementById('noAvailability');
     const servicoCard = document.getElementById('servicoCard');
-    const searchSitterCard = document.getElementById('searchSitterCard');
 
-    // PASSO 1: Pet selecionado
     window.onPetSelected = function() {
-        const petId = document.getElementById('id_pet').value;
-        if (petId) {
+        const petSelect = document.getElementById('id_pet');
+        if (petSelect.value) {
             document.getElementById('step1-circle').classList.add('completed');
             document.getElementById('step2-circle').classList.add('active');
             servicoCard.style.display = 'block';
@@ -433,92 +449,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // PASSO 2: Serviço selecionado
     window.onServiceSelected = function() {
-        const serviceId = document.getElementById('id_servico').value;
-        if (serviceId) {
-            document.getElementById('step2-circle').classList.add('completed');
-            document.getElementById('step3-circle').classList.add('active');
-            searchSitterCard.style.display = 'block';
-            setTimeout(() => searchSitterCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-        }
-    };
+        const serviceSelect = document.getElementById('id_servico');
+        const serviceId = serviceSelect.value;
+        const preferredSitterId = new URLSearchParams(window.location.search).get('sitter_id');
 
-    // PASSO 3: Buscar sitters
-    btnSearch.addEventListener('click', function() {
-        const cidade = searchCidade.value;
-        const estado = searchEstado.value;
-
-        if (!cidade && !estado) {
-            alert('Digite pelo menos a cidade ou estado para buscar');
+        if (!serviceId) {
             return;
         }
 
-        searchSpinner.classList.add('active');
-        btnSearch.disabled = true;
+        const selectedOption = serviceSelect.selectedOptions[0];
+        selectedServiceDuration = Number(selectedOption?.dataset.duracao || 60);
+        document.getElementById('step2-circle').classList.add('completed');
 
-        fetch(`{{ route('agendamentos.searchSitters') }}?cidade=${cidade}&estado=${estado}`)
-            .then(response => response.json())
-            .then(data => {
-                sittersList.innerHTML = '';
+        if (!preferredSitterId) {
+            alert('Selecione um sitter na página dos profissionais para continuar o agendamento.');
+            return;
+        }
 
-                if (data.length === 0) {
-                    searchResults.style.display = 'none';
-                    noResults.style.display = 'block';
-                } else {
-                    noResults.style.display = 'none';
-                    searchResults.style.display = 'block';
-
-                    data.forEach(sitter => {
-                        const card = document.createElement('div');
-                        card.className = 'sitter-card';
-                        card.onclick = () => selectSitter(sitter);
-                        card.innerHTML = `
-                            <div>
-                                <strong>${sitter.name}</strong>
-                                <div class="location-badge">
-                                    📍 ${sitter.cidade}, ${sitter.estado}
-                                </div>
-                                <small class="text-muted d-block mt-2">${sitter.endereco}</small>
-                            </div>
-                        `;
-                        sittersList.appendChild(card);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao buscar sitters');
-            })
-            .finally(() => {
-                searchSpinner.classList.remove('active');
-                btnSearch.disabled = false;
-            });
-    });
-
-    // PASSO 4: Selecionar sitter
-    function selectSitter(sitter) {
-        // Atualizar hidden input
-        sitterInput.value = sitter.id;
-
-        // Atualizar cards visuais
-        document.querySelectorAll('.sitter-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        event.currentTarget.classList.add('selected');
-
-        // Atualizar step indicators
-        document.getElementById('step3-circle').classList.add('completed');
+        sitterInput.value = preferredSitterId;
+        const step3 = document.getElementById('step3-circle');
+        if (step3) {
+            step3.classList.add('completed');
+        }
         document.getElementById('step4-circle').classList.add('active');
-
-        // Mostrar card de disponibilidade
         availabilityCard.style.display = 'block';
-        loadSitterAvailability(sitter.id);
+        loadSitterAvailability(preferredSitterId);
 
-        // Scroll para disponibilidade
         setTimeout(() => {
             availabilityCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        }, 150);
+    };
+
+    const preferredSitterId = new URLSearchParams(window.location.search).get('sitter_id');
+    if (preferredSitterId) {
+        sitterInput.value = preferredSitterId;
+        const step3 = document.getElementById('step3-circle');
+        if (step3) {
+            step3.classList.add('completed');
+        }
+        document.getElementById('step4-circle').classList.add('active');
+        availabilityCard.style.display = 'block';
+        loadSitterAvailability(preferredSitterId);
+        setTimeout(() => {
+            availabilityCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
     }
 
     // PASSO 5: Carregar disponibilidade do sitter (F_F03)
@@ -527,42 +502,139 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 availabilityGrid.innerHTML = '';
+                const slotContainer = document.getElementById('slotContainer');
+                slotContainer.innerHTML = '';
+                slotContainer.style.display = 'none';
 
                 if (data.disponibilidades.length === 0) {
                     noAvailability.style.display = 'block';
                     dateTimeCard.style.display = 'none';
                     confirmCard.style.display = 'none';
                     submitButtons.style.display = 'none';
-                } else {
-                    noAvailability.style.display = 'none';
+                    return;
+                }
 
-                    data.disponibilidades.forEach(disp => {
-                        const item = document.createElement('div');
-                        item.className = 'availability-item';
-                        item.innerHTML = `
-                            <strong>${disp.dia_semana}</strong><br>
-                            ${disp.hora_inicio} às ${disp.hora_fim}
-                        `;
-                        availabilityGrid.appendChild(item);
+                noAvailability.style.display = 'none';
+
+                const days = getNextDays(7);
+                const mapByDayName = {};
+
+                data.disponibilidades.forEach(disp => {
+                    const key = normalizeDayKey(disp.dia_semana);
+                    mapByDayName[key] = mapByDayName[key] || [];
+                    mapByDayName[key].push(disp);
+                });
+
+                days.forEach((day) => {
+                    const label = day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                    const dayKey = normalizeDayKey(day.toLocaleDateString('pt-BR', { weekday: 'long' }));
+                    const hasSlots = mapByDayName[dayKey] || [];
+
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'calendar-day';
+                    item.innerHTML = `<small>${label.split(',')[0]}</small><strong>${day.getDate()}</strong><small>${day.toLocaleDateString('pt-BR', { month: 'short' })}</small>`;
+                    item.disabled = !hasSlots.length;
+                    item.style.opacity = hasSlots.length ? '1' : '0.5';
+
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.calendar-day').forEach(btn => btn.classList.remove('selected'));
+                        item.classList.add('selected');
+                        renderTimeSlots(day, hasSlots);
                     });
 
-                    // Mostrar próximos passos
-                    document.getElementById('step4-circle').classList.remove('active');
-                    document.getElementById('step4-circle').classList.add('completed');
-                    document.getElementById('step5-circle').classList.add('active');
-                    
-                    dateTimeCard.style.display = 'block';
-                    
-                    // Scroll para o próximo passo
-                    setTimeout(() => {
-                        dateTimeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
+                    availabilityGrid.appendChild(item);
+                });
+
+                document.getElementById('step4-circle').classList.remove('active');
+                document.getElementById('step4-circle').classList.add('completed');
+                document.getElementById('step5-circle').classList.add('active');
+                dateTimeCard.style.display = 'block';
+
+                setTimeout(() => {
+                    dateTimeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             })
             .catch(error => {
                 console.error('Erro:', error);
                 alert('Erro ao carregar disponibilidade');
             });
+    }
+
+    function normalizeDayKey(value) {
+        return String(value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function getNextDays(qtd) {
+        const result = [];
+        const hoje = new Date();
+        for (let i = 0; i < qtd; i++) {
+            const d = new Date(hoje);
+            d.setDate(hoje.getDate() + i);
+            result.push(d);
+        }
+        return result;
+    }
+
+    function renderTimeSlots(selectedDate, disponibilidades) {
+        const slotContainer = document.getElementById('slotContainer');
+        slotContainer.innerHTML = '';
+        slotContainer.style.display = 'flex';
+
+        const slots = [];
+        disponibilidades.forEach(disp => {
+            const inicio = toMinutes(disp.hora_inicio);
+            const fim = toMinutes(disp.hora_fim);
+            for (let current = inicio; current + selectedServiceDuration <= fim; current += selectedServiceDuration) {
+                const start = minutesToTime(current);
+                const end = minutesToTime(current + selectedServiceDuration);
+                slots.push({
+                    label: `${start} - ${end}`,
+                    start,
+                    end
+                });
+            }
+        });
+
+        if (!slots.length) {
+            slotContainer.innerHTML = '<div class="text-muted">Nenhum horário disponível neste dia.</div>';
+            return;
+        }
+
+        slots.forEach(slot => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'slot-button';
+            btn.textContent = slot.label;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.slot-button').forEach(el => el.classList.remove('selected'));
+                btn.classList.add('selected');
+
+                const dateValue = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000)
+                    .toISOString()
+                    .slice(0, 10);
+                const inicio = `${dateValue}T${slot.start}`;
+                const fim = `${dateValue}T${slot.end}`;
+                document.getElementById('data_inicio').value = inicio;
+                document.getElementById('data_fim').value = fim;
+                showConfirmation();
+            });
+            slotContainer.appendChild(btn);
+        });
+    }
+
+    function toMinutes(time) {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function minutesToTime(totalMinutes) {
+        const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+        const minutes = String(totalMinutes % 60).padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
 
     // Quando data/hora são preenchidas, mostrar confirmação
@@ -592,16 +664,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generateSummary() {
         const petSelect = document.getElementById('id_pet');
+        const petName = petSelect.options[petSelect.selectedIndex]?.text || 'Nenhum pet selecionado';
         const serviceSelect = document.getElementById('id_servico');
         const dataInicio = document.getElementById('data_inicio').value;
         const dataFim = document.getElementById('data_fim').value;
-        const sitterName = document.querySelector('.sitter-card.selected strong')?.textContent || 'N/A';
+        const sitterInput = document.getElementById('id_user_sitter');
+        const sitterName = sitterInput?.dataset?.sitterName || document.querySelector('.sitter-card.selected strong')?.textContent || 'N/A';
 
         const summary = `
             <div class="col-md-6">
                 <div class="mb-2">
                     <small style="color:#78716C; font-size:0.85rem;">Pet</small>
-                    <div style="color:#1C1917; font-weight:600;">${petSelect.options[petSelect.selectedIndex].text}</div>
+                    <div style="color:#1C1917; font-weight:600;">${petName}</div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -639,18 +713,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('confirmSummary').innerHTML = summary;
     }
 
-    // Permitir busca com Enter
-    searchCidade.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            btnSearch.click();
-        }
-    });
-
-    searchEstado.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            btnSearch.click();
-        }
-    });
 });
 </script>
 @endpush

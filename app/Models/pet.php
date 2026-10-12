@@ -59,4 +59,5 @@ class Pet extends Model
     {
         return $this->hasMany(Agendamento::class, 'id_pet');
     }
+
 }

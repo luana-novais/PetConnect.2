@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="sitter-actions">
-                    <a href="{{ route('agendamentos.create') }}" class="btn sitter-book-button">
+                    <a href="{{ route('agendamentos.create', ['sitter_id' => $sitter->id]) }}" class="btn sitter-book-button">
                         <i class="bi bi-calendar-plus me-1"></i> Agendar sitter
                     </a>
                 </div>

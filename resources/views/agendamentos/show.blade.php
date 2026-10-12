@@ -5,6 +5,37 @@
 
 @push('styles')
     <link href="{{ asset('css/show.css') }}" rel="stylesheet">
+    <style>
+        .booking-action-group {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .booking-action-group > * {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .booking-action-group .btn,
+        .booking-action-group form,
+        .booking-action-group a {
+            display: flex;
+            width: 100%;
+        }
+
+        .booking-action-group .btn {
+            border-radius: 0.55rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            min-height: 38px;
+            width: 100%;
+            white-space: nowrap;
+        }
+    </style>
 @endpush
 
 @section('breadcrumb')
@@ -176,54 +207,52 @@
             <div class="card-header">
                 <i class="bi bi-lightning-fill me-2 text-warning"></i>Ações
             </div>
-            <div class="card-body p-2 d-flex flex-column gap-2">
-                {{-- Confirmar Agendamento para sitter --}}
-                @if(auth()->user()->role === 'PRO' && $agendamento->status === 'pendente' && $agendamento->id_user_sitter === auth()->id())
-                    <form action="{{ route('agendamentos.confirm', $agendamento->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('PUT')
-                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Confirmar este agendamento?')">
-                            <i class="bi bi-check-circle me-1"></i> Confirmar Agendamento
+            <div class="card-body p-3">
+                <div class="booking-action-group">
+                    @if(auth()->user()->role === 'PRO' && $agendamento->status === 'pendente' && $agendamento->id_user_sitter === auth()->id())
+                        <form action="{{ route('agendamentos.confirm', $agendamento->id) }}" method="POST" class="m-0">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Confirmar este agendamento?')">
+                                Confirmar
+                            </button>
+                        </form>
+                    @endif
+
+                    @if(auth()->user()->role === 'PRO' && $agendamento->status === 'confirmado' && $agendamento->id_user_sitter === auth()->id() && $agendamento->data_fim && !\Carbon\Carbon::parse($agendamento->data_fim)->isFuture())
+                        <form action="{{ route('agendamentos.complete', $agendamento->id) }}" method="POST" class="m-0">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Marcar este atendimento como concluído?')">
+                                <i class="bi bi-check2-all me-1"></i> Concluir Atendimento
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                            Cancelar
                         </button>
-                    </form>
-                @endif
+                    @endif
 
-                @if(auth()->user()->role === 'PRO' && $agendamento->status === 'confirmado' && $agendamento->id_user_sitter === auth()->id() && $agendamento->data_fim && !\Carbon\Carbon::parse($agendamento->data_fim)->isFuture())
-                    <form action="{{ route('agendamentos.complete', $agendamento->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Marcar este atendimento como concluído?')">
-                            <i class="bi bi-check2-all me-1"></i> Concluir Atendimento
+                    @if($agendamento->status === 'concluido' && auth()->user()->role === 'CLI' && $agendamento->id_user_cliente === auth()->id() && $agendamento->avaliacoes->isEmpty())
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#avaliacaoModal">
+                            <i class="bi bi-star-fill me-1"></i> Deixar Avaliação
                         </button>
-                    </form>
-                @endif
+                    @endif
 
-                {{-- Cancelar Agendamento (F_F04) --}}
-                @if($agendamento->status !== 'cancelado' && $agendamento->status !== 'concluido')
-                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                        <i class="bi bi-x-circle me-1"></i> Cancelar Agendamento
-                    </button>
-                @endif
+                    @if($agendamento->status === 'concluido' && $agendamento->avaliacoes->isNotEmpty())
+                        <div class="alert alert-success mb-0">
+                            <i class="bi bi-check-circle me-1"></i> Avaliação enviada.
+                        </div>
+                    @endif
 
-                {{-- Avaliar Usuário (F_F05) --}}
-                @if($agendamento->status === 'concluido' && auth()->user()->role === 'CLI' && $agendamento->id_user_cliente === auth()->id() && $agendamento->avaliacoes->isEmpty())
-                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#avaliacaoModal">
-                        <i class="bi bi-star-fill me-1"></i> Deixar Avaliação
-                    </button>
-                @endif
-
-                @if($agendamento->status === 'concluido' && $agendamento->avaliacoes->isNotEmpty())
-                    <div class="alert alert-success mb-0">
-                        <i class="bi bi-check-circle me-1"></i> Avaliação enviada.
-                    </div>
-                @endif
-
-                {{-- Botão Editar --}}
-                @if($agendamento->status === 'pendente' && auth()->user()->role !== 'PRO')
-                    <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-warning btn-sm">
-                        <i class="bi bi-pencil me-1"></i> Editar
-                    </a>
-                @endif
+                    @if($agendamento->status === 'pendente' && auth()->user()->role !== 'PRO')
+                        <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

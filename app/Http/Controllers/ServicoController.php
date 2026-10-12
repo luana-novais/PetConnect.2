@@ -59,6 +59,7 @@ class ServicoController extends Controller
         $data = $request->validate([
             'nome' => 'required|string|max:255',
             'valor_servico' => 'required|numeric|min:0',
+            'duracao_minutos' => 'required|integer|min:15|max:720',
         ]);
 
         try {
@@ -117,6 +118,7 @@ class ServicoController extends Controller
             $data = $request->validate([
                 'nome' => 'required|string|max:255',
                 'valor_servico' => 'required|numeric|min:0',
+                'duracao_minutos' => 'required|integer|min:15|max:720',
             ]);
 
             try {

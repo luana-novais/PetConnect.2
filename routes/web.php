@@ -64,12 +64,13 @@ Route::get('/landing', function () {
     return view('landing');
 })->name('landing');
 
-// Rota raiz — redireciona para dashboard se autenticado ou para a landing page pública
+// Rota raiz — mostra a landing page para visitantes e envia autenticados para o dashboard
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('welcome');
     }
-    return redirect()->route('landing');
+
+    return view('landing');
 })->name('home');
 
 // Rota de boas-vindas/dashboard

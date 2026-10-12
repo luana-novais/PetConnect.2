@@ -73,6 +73,20 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="col-md-6">
+                            <label for="duracao_minutos" class="form-label">Duração do Serviço <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" step="15" min="15" max="720" id="duracao_minutos" name="duracao_minutos"
+                                       class="form-control @error('duracao_minutos') is-invalid @enderror"
+                                       value="{{ old('duracao_minutos', 60) }}" placeholder="60"
+                                       required>
+                                <span class="input-group-text">min</span>
+                            </div>
+                            @error('duracao_minutos')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             </div>

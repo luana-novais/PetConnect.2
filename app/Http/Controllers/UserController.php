@@ -39,14 +39,21 @@ class UserController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'role'     => 'required|in:ADM,PRO,CLI',
-            'numero'   => 'nullable|string|max:20',
-            'endereco' => 'nullable|string|max:255',
-            'cidade'   => 'nullable|string|max:100',
-            'estado'   => 'nullable|string|max:100',
-            'cep'      => 'nullable|string|max:10',
-            'foto'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'password' => 'required|min:6|confirmed',
+            'role'     => 'required|in:CLI,PRO',
+            'numero'     => 'nullable|string|max:20',
+            'endereco'   => 'nullable|string|max:255',
+            'complemento' => 'nullable|string|max:255',
+            'cidade'     => 'nullable|string|max:100',
+            'estado'     => 'nullable|string|max:100',
+            'cep'        => 'nullable|string|max:10',
+            'foto'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'password.required'  => 'A senha é obrigatória.',
+            'password.min'       => 'A senha deve ter pelo menos 6 caracteres.',
+            'password.confirmed' => 'As senhas não correspondem.',
+            'role.required'      => 'Selecione um tipo de usuário.',
+            'role.in'            => 'Perfil inválido.',
         ]);
 
         try {
@@ -66,11 +73,12 @@ class UserController extends Controller
 
             if ($request->filled('endereco')) {
                 Endereco::create([
-                    'id_user'  => $user->id,
-                    'endereco' => $request->endereco,
-                    'cidade'   => $request->cidade,
-                    'estado'   => $request->estado,
-                    'cep'      => $request->cep,
+                    'id_user'    => $user->id,
+                    'endereco'   => $request->endereco,
+                    'complemento' => $request->complemento,
+                    'cidade'     => $request->cidade,
+                    'estado'     => $request->estado,
+                    'cep'        => $request->cep,
                 ]);
             }
 
@@ -134,6 +142,7 @@ class UserController extends Controller
             'email'            => 'required|email|unique:users,email,' . $id,
             'numero'           => 'nullable|string|max:20',
             'endereco'         => 'nullable|string|max:255',
+            'complemento'      => 'nullable|string|max:255',
             'cidade'           => 'nullable|string|max:100',
             'estado'           => 'nullable|string|max:100',
             'cep'              => 'nullable|string|max:10',
@@ -182,10 +191,11 @@ class UserController extends Controller
             Endereco::updateOrCreate(
                 ['id_user' => $id],
                 [
-                    'endereco' => $request->endereco,
-                    'cidade'   => $request->cidade,
-                    'estado'   => $request->estado,
-                    'cep'      => $request->cep,
+                    'endereco'   => $request->endereco,
+                    'complemento' => $request->complemento,
+                    'cidade'     => $request->cidade,
+                    'estado'     => $request->estado,
+                    'cep'        => $request->cep,
                 ]
             );
 

@@ -17,7 +17,7 @@
 }
 
 .service-card {
-    align-items: center;
+    align-items: stretch;
     background: #fff;
     border: 1px solid #e7e5e4;
     border-radius: 1rem;
@@ -46,7 +46,10 @@
 }
 
 .service-body {
-    flex: 1;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
     min-width: 0;
 }
 
@@ -56,6 +59,7 @@
     flex-wrap: wrap;
     gap: .75rem;
     justify-content: space-between;
+    width: 100%;
 }
 
 .service-title {
@@ -69,6 +73,16 @@
 .service-meta {
     color: #78716c;
     font-size: .82rem;
+}
+
+.service-side-group {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: .8rem;
+    justify-content: flex-end;
+    margin-left: auto;
+    min-width: 280px;
 }
 
 .service-price {
@@ -86,9 +100,11 @@
 }
 
 .service-actions {
+    align-items: center;
     display: flex;
+    flex-direction: row;
     flex-shrink: 0;
-    gap: .4rem;
+    gap: .5rem;
 }
 
 .service-actions .btn {
@@ -97,7 +113,7 @@
 }
 
 .service-view-button {
-    border: 1px solid #e7e5e4;
+    border: 1px solid #d6d3d1;
     color: #57534e;
 }
 

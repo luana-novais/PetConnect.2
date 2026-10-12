@@ -72,13 +72,14 @@ class AgendamentoController extends Controller
         return redirect()->back()->with('success', 'Atendimento concluído com sucesso!');
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $clientes = Auth::user() ? [Auth::user()] : [];
         $pets = Auth::user() ? Auth::user()->pets : [];
         $servicos = Servico::all();
+        $selectedSitter = $request->filled('sitter_id') ? User::find($request->sitter_id) : null;
 
-        return view('agendamentos.create', compact('clientes', 'pets', 'servicos'));
+        return view('agendamentos.create', compact('clientes', 'pets', 'servicos', 'selectedSitter'));
     }
 
     /**
@@ -158,17 +159,17 @@ class AgendamentoController extends Controller
             'observacoes'     => 'nullable|string|max:1000',
         ], [
             'id_pet.required'          => 'Selecione um pet.',
-            'id_pet.exists'            => 'O pet selecionado não existe.',
-            'id_user_sitter.required'  => 'Selecione um sitter.',
-            'id_user_sitter.exists'    => 'O sitter selecionado não existe.',
-            'id_servico.required'      => 'Selecione um serviço.',
-            'id_servico.exists'        => 'O serviço selecionado não existe.',
-            'data_inicio.required'     => 'Informe a data e hora de início.',
-            'data_inicio.date_format'  => 'Formato de data/hora inválido.',
+            'id_pet.exists'           => 'O pet selecionado não existe.',
+            'id_user_sitter.required' => 'Selecione um sitter.',
+            'id_user_sitter.exists'   => 'O sitter selecionado não existe.',
+            'id_servico.required'     => 'Selecione um serviço.',
+            'id_servico.exists'       => 'O serviço selecionado não existe.',
+            'data_inicio.required'    => 'Informe a data e hora de início.',
+            'data_inicio.date_format' => 'Formato de data/hora inválido.',
             'data_inicio.after_or_equal' => 'A data/hora de início não pode ser no passado.',
-            'data_fim.required'        => 'Informe a data e hora de término.',
-            'data_fim.date_format'     => 'Formato de data/hora inválido.',
-            'data_fim.after'           => 'A data/hora de término deve ser depois do início.',
+            'data_fim.required'       => 'Informe a data e hora de término.',
+            'data_fim.date_format'    => 'Formato de data/hora inválido.',
+            'data_fim.after'          => 'A data/hora de término deve ser depois do início.',
         ]);
 
         $sitter = User::findOrFail($request->id_user_sitter);
@@ -316,17 +317,17 @@ class AgendamentoController extends Controller
             'id_user_cliente.required' => 'Selecione um cliente.',
             'id_user_cliente.exists'   => 'O cliente selecionado não existe.',
             'id_pet.required'          => 'Selecione um pet.',
-            'id_pet.exists'            => 'O pet selecionado não existe.',
-            'id_user_sitter.required'  => 'Selecione um sitter.',
-            'id_user_sitter.exists'    => 'O sitter selecionado não existe.',
-            'id_servico.required'      => 'Selecione um serviço.',
-            'id_servico.exists'        => 'O serviço selecionado não existe.',
-            'data_inicio.required'     => 'Informe a data e hora de início.',
-            'data_inicio.date_format'  => 'Formato de data/hora inválido.',
+            'id_pet.exists'           => 'O pet selecionado não existe.',
+            'id_user_sitter.required' => 'Selecione um sitter.',
+            'id_user_sitter.exists'   => 'O sitter selecionado não existe.',
+            'id_servico.required'     => 'Selecione um serviço.',
+            'id_servico.exists'       => 'O serviço selecionado não existe.',
+            'data_inicio.required'    => 'Informe a data e hora de início.',
+            'data_inicio.date_format' => 'Formato de data/hora inválido.',
             'data_inicio.after_or_equal' => 'A data/hora de início não pode ser no passado.',
-            'data_fim.required'        => 'Informe a data e hora de término.',
-            'data_fim.date_format'     => 'Formato de data/hora inválido.',
-            'data_fim.after'           => 'A data/hora de término deve ser depois do início.',
+            'data_fim.required'       => 'Informe a data e hora de término.',
+            'data_fim.date_format'    => 'Formato de data/hora inválido.',
+            'data_fim.after'          => 'A data/hora de término deve ser depois do início.',
         ]);
 
         $sitter = User::findOrFail($request->id_user_sitter);
@@ -345,10 +346,12 @@ class AgendamentoController extends Controller
             return redirect()->back()->withInput()->with('error', 'Já existe outro agendamento neste horário para o pet sitter selecionado.');
         }
 
-        $agendamento->update($request->only([
+        $dados = $request->only([
             'id_user_cliente', 'id_pet', 'id_user_sitter',
             'id_servico', 'data_inicio', 'data_fim', 'observacoes',
-        ]));
+        ]);
+
+        $agendamento->update($dados);
 
         return redirect()->route('agendamentos.show', $agendamento->id)->with('success', 'Agendamento atualizado com sucesso!');
     }

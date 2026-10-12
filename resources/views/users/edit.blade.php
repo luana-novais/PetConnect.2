@@ -147,6 +147,14 @@
                        placeholder="Rua, número">
                 @error('endereco')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
+            <div class="col-md-6">
+                <label class="form-label" style="font-size:.78rem;">Complemento</label>
+                <input type="text" name="complemento"
+                       class="form-control @error('complemento') is-invalid @enderror"
+                       value="{{ old('complemento', $endereco?->complemento) }}"
+                       placeholder="Apartamento, bloco, casa, etc.">
+                @error('complemento')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
         </div>
     </div>
 </div>

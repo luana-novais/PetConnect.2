@@ -84,24 +84,26 @@
                                     <span class="availability-owner">Horário disponível para atendimentos</span>
                                 @endif
                             </div>
-                            <span class="availability-status"><i class="bi bi-check-circle-fill me-1"></i>Ativo</span>
                         </div>
                         <div class="availability-time">
                             <i class="bi bi-hourglass-split"></i>
                             {{ date('H:i', strtotime($disp->hora_inicio)) }} às {{ date('H:i', strtotime($disp->hora_fim)) }}
                         </div>
                     </div>
-                    <div class="availability-actions">
-                        <a href="{{ route('disponibilidades.edit', $disp->id) }}" class="btn availability-edit-button">
-                            <i class="bi bi-pencil me-1"></i> Editar
-                        </a>
-                        <form action="{{ route('disponibilidades.destroy', $disp->id) }}" method="POST" onsubmit="return confirm('Deseja excluir esta disponibilidade?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn availability-delete-button">
-                                <i class="bi bi-trash me-1"></i> Excluir
-                            </button>
-                        </form>
+                    <div class="availability-side">
+                        <span class="availability-status"><i class="bi bi-check-circle-fill me-1"></i>Ativo</span>
+                        <div class="availability-actions">
+                            <a href="{{ route('disponibilidades.edit', $disp->id) }}" class="btn availability-edit-button">
+                                <i class="bi bi-pencil me-1"></i> Editar
+                            </a>
+                            <form action="{{ route('disponibilidades.destroy', $disp->id) }}" method="POST" onsubmit="return confirm('Deseja excluir esta disponibilidade?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn availability-delete-button">
+                                    <i class="bi bi-trash me-1"></i> Excluir
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </article>
             @endforeach

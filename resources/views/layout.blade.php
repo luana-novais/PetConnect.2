@@ -43,10 +43,6 @@
                     <i class="bi bi-scissors"></i>
                     <span class="nav-text">Serviços</span>
                 </a>
-                <a href="{{ route('disponibilidades.index') }}" class="nav-link {{ request()->is('disponibilidades*') ? 'active' : '' }}">
-                    <i class="bi bi-clock"></i>
-                    <span class="nav-text">Disponibilidade</span>
-                </a>
                 <a href="{{ route('pagamentos.index') }}" class="nav-link {{ request()->is('pagamentos*') ? 'active' : '' }}">
                     <i class="bi bi-credit-card"></i>
                     <span class="nav-text">Pagamentos</span>

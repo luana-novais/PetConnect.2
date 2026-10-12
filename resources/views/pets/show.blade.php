@@ -105,7 +105,23 @@
                             @if($pet->data_nascimento)
                                 {{ $pet->data_nascimento->format('d/m/Y') }}
                                 <div class="text-muted fw-normal" style="font-size:0.82rem;">
-                                    {{ $pet->data_nascimento->diffForHumans() }}
+                                    @php
+                                        $idade = $pet->data_nascimento->diff(now());
+                                        $idadeAnos = $idade->y;
+                                        $idadeMeses = $idade->m;
+                                        $textoIdade = [];
+
+                                        if ($idadeAnos > 0) {
+                                            $textoIdade[] = $idadeAnos . ' ' . ($idadeAnos === 1 ? 'ano' : 'anos');
+                                        }
+
+                                        if ($idadeMeses > 0) {
+                                            $textoIdade[] = $idadeMeses . ' ' . ($idadeMeses === 1 ? 'mês' : 'meses');
+                                        }
+
+                                        $textoIdadeFinal = $textoIdade ? implode(' e ', $textoIdade) : 'Menos de 1 mês';
+                                    @endphp
+                                    {{ $textoIdadeFinal }}
                                 </div>
                             @else
                                 <span class="text-muted">Não informado</span>

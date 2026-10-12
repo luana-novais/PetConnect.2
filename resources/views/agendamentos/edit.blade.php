@@ -5,6 +5,29 @@
 
 @push('styles')
     <link href="{{ asset('css/form.css') }}" rel="stylesheet">
+    <style>
+        .readonly-form .form-control:disabled,
+        .readonly-form .form-select:disabled,
+        .readonly-form textarea:disabled {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            opacity: 1;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+
+        .readonly-form .form-control,
+        .readonly-form .form-select,
+        .readonly-form textarea {
+            border-radius: 10px;
+            min-height: 46px;
+        }
+
+        .readonly-form .form-label {
+            font-weight: 600;
+            color: #374151;
+        }
+    </style>
 @endpush
 
 @section('breadcrumb')
@@ -37,9 +60,14 @@
             </div>
         </div>
 
-        <form action="{{ route('agendamentos.update', $agendamento->id) }}" method="POST">
+        <form action="{{ route('agendamentos.update', $agendamento->id) }}" method="POST" class="readonly-form">
             @csrf
             @method('PUT')
+
+            <input type="hidden" name="id_user_cliente" value="{{ old('id_user_cliente', $agendamento->id_user_cliente) }}">
+            <input type="hidden" name="id_pet" value="{{ old('id_pet', $agendamento->id_pet) }}">
+            <input type="hidden" name="id_user_sitter" value="{{ old('id_user_sitter', $agendamento->id_user_sitter) }}">
+            <input type="hidden" name="id_servico" value="{{ old('id_servico', $agendamento->id_servico) }}">
 
             {{-- Erros gerais --}}
             @if($errors->any())
@@ -67,7 +95,7 @@
                         <div class="col-md-6">
                             <label for="id_user_cliente" class="form-label">Cliente <span class="text-danger">*</span></label>
                             <select id="id_user_cliente" name="id_user_cliente"
-                                    class="form-select @error('id_user_cliente') is-invalid @enderror" required>
+                                    class="form-select @error('id_user_cliente') is-invalid @enderror" disabled required>
                                 <option value="">Selecione o cliente...</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}" {{ old('id_user_cliente', $agendamento->id_user_cliente) == $cliente->id ? 'selected' : '' }}>
@@ -83,11 +111,11 @@
                         <div class="col-md-6">
                             <label for="id_pet" class="form-label">Pet <span class="text-danger">*</span></label>
                             <select id="id_pet" name="id_pet"
-                                    class="form-select @error('id_pet') is-invalid @enderror" required>
+                                    class="form-select @error('id_pet') is-invalid @enderror" disabled required>
                                 <option value="">Selecione o pet...</option>
                                 @foreach($pets as $pet)
                                     <option value="{{ $pet->id }}" {{ old('id_pet', $agendamento->id_pet) == $pet->id ? 'selected' : '' }}>
-                                        {{ $pet->nome }}
+                                        {{ $pet->nome }} - {{ $pet->especie->tipo_pet ?? 'N/A' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -99,7 +127,7 @@
                         <div class="col-md-6">
                             <label for="id_user_sitter" class="form-label">Sitter <span class="text-danger">*</span></label>
                             <select id="id_user_sitter" name="id_user_sitter"
-                                    class="form-select @error('id_user_sitter') is-invalid @enderror" required>
+                                    class="form-select @error('id_user_sitter') is-invalid @enderror" disabled required>
                                 <option value="">Selecione o sitter...</option>
                                 @foreach($sitters as $sitter)
                                     <option value="{{ $sitter->id }}" {{ old('id_user_sitter', $agendamento->id_user_sitter) == $sitter->id ? 'selected' : '' }}>
@@ -193,5 +221,20 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const petSelect = document.getElementById('id_pet');
+        if (petSelect) {
+            petSelect.addEventListener('change', function() {
+                if (petSelect.value) {
+                    petSelect.classList.remove('is-invalid');
+                }
+            });
+        }
+    });
+</script>
+@endpush
 
 @endsection

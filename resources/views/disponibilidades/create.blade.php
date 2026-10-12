@@ -34,12 +34,12 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Hora de Início</label>
-                            <input type="time" name="hora_inicio" class="form-control @error('hora_inicio') is-invalid @enderror" value="{{ old('hora_inicio') }}" required>
+                            <input type="time" step="60" name="hora_inicio" class="form-control @error('hora_inicio') is-invalid @enderror" value="{{ old('hora_inicio') }}" required>
                             @error('hora_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Hora de Término</label>
-                            <input type="time" name="hora_fim" class="form-control @error('hora_fim') is-invalid @enderror" value="{{ old('hora_fim') }}" required>
+                            <input type="time" step="60" name="hora_fim" class="form-control @error('hora_fim') is-invalid @enderror" value="{{ old('hora_fim') }}" required>
                             @error('hora_fim')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>

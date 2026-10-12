@@ -80,19 +80,21 @@
                                 <span class="service-subtitle">Serviço oferecido por você</span>
                             @endif
                         </div>
-                        <strong class="service-price">R$ {{ number_format($s->valor_servico, 2, ',', '.') }}</strong>
                     </div>
                     <div class="service-meta"><i class="bi bi-tag"></i> Preço individual do serviço</div>
                 </div>
-                <div class="service-actions">
-                    <a href="{{ route('servicos.show', $s->id) }}" class="btn service-view-button">
-                        <i class="bi bi-eye me-1"></i> Consultar
-                    </a>
-                    @if(auth()->user()->role === 'PRO')
-                        <a href="{{ route('servicos.edit', $s->id) }}" class="btn service-edit-button">
-                            <i class="bi bi-pencil me-1"></i> Editar
+                <div class="service-side-group">
+                    <strong class="service-price">R$ {{ number_format($s->valor_servico, 2, ',', '.') }}</strong>
+                    <div class="service-actions">
+                        <a href="{{ route('servicos.show', $s->id) }}" class="btn btn-outline-secondary service-view-button">
+                            <i class="bi bi-eye me-1"></i> Consultar
                         </a>
-                    @endif
+                        @if(auth()->user()->role === 'PRO')
+                            <a href="{{ route('servicos.edit', $s->id) }}" class="btn service-edit-button">
+                                <i class="bi bi-pencil me-1"></i> Editar
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </article>
         @endforeach

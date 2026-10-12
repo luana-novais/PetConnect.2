@@ -122,7 +122,6 @@
         $adminClientCount = \App\Models\User::where('role', 'CLI')->count();
         $adminSitterCount = \App\Models\User::where('role', 'PRO')->count();
         $adminPetCount = \App\Models\Pet::count();
-        $adminServiceCount = \App\Models\Servico::count();
         $adminPendingCount = \App\Models\Agendamento::where('status', 'pendente')->count();
         $adminConfirmedCount = \App\Models\Agendamento::where('status', 'confirmado')->count();
         $adminCompletedCount = \App\Models\Agendamento::where('status', 'concluido')->count();
@@ -139,75 +138,64 @@
     @endphp
 
     <div class="admin-dashboard">
-        <div class="admin-hero rounded-4 p-4 mb-4">
-            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-                <div>
-                    <div class="text-muted small mb-1">Painel administrativo</div>
-                    <h4 class="mb-2" style="color:#1C1917;">Visão geral da PetConnect</h4>
-                    <p class="text-muted mb-0" style="font-size:.88rem;">Monitore a operação, a base de usuários e a saúde da plataforma.</p>
-                </div>
-                <i class="bi bi-speedometer2" style="font-size:2.2rem;color:#ea580c;"></i>
-            </div>
-        </div>
-
         <div class="row g-3 mb-4">
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
                     <div class="admin-stat-icon mb-3"><i class="bi bi-people"></i></div>
                     <div class="admin-stat-value">{{ $adminUserCount }}</div>
-                    <div class="admin-stat-label">Usuários cadastrados</div>
+                    <div class="admin-stat-label">Usuários totais</div>
                 </div>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="admin-stat">
+                    <div class="admin-stat-icon mb-3"><i class="bi bi-person-hearts"></i></div>
+                    <div class="admin-stat-value">{{ $adminClientCount }}</div>
+                    <div class="admin-stat-label">Clientes ativos</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
                     <div class="admin-stat-icon mb-3"><i class="bi bi-person-badge"></i></div>
                     <div class="admin-stat-value">{{ $adminSitterCount }}</div>
                     <div class="admin-stat-label">Sitters ativos</div>
                 </div>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
-                    <div class="admin-stat-icon mb-3"><i class="bi bi-briefcase"></i></div>
-                    <div class="admin-stat-value">{{ $adminServiceCount }}</div>
-                    <div class="admin-stat-label">Serviços cadastrados</div>
-                </div>
-            </div>
-            <div class="col-6 col-xl-3">
-                <div class="admin-stat">
-                    <div class="admin-stat-icon mb-3"><i class="bi bi-heart"></i></div>
-                    <div class="admin-stat-value">{{ $adminPetCount }}</div>
-                    <div class="admin-stat-label">Pets cadastrados</div>
+                    <div class="admin-stat-icon mb-3"><i class="bi bi-calendar2-check"></i></div>
+                    <div class="admin-stat-value">{{ $adminPendingCount }}</div>
+                    <div class="admin-stat-label">Agendamentos pendentes</div>
                 </div>
             </div>
         </div>
 
         <div class="row g-3 mb-4">
-            <div class="col-6 col-xl-3">
-                <div class="admin-stat">
-                    <div class="admin-stat-icon mb-3"><i class="bi bi-hourglass-split"></i></div>
-                    <div class="admin-stat-value">{{ $adminPendingCount }}</div>
-                    <div class="admin-stat-label">Aguardando confirmação</div>
-                </div>
-            </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
                     <div class="admin-stat-icon mb-3"><i class="bi bi-check2-circle"></i></div>
                     <div class="admin-stat-value">{{ $adminCompletedCount }}</div>
                     <div class="admin-stat-label">Atendimentos concluídos</div>
                 </div>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
-                    <div class="admin-stat-icon mb-3"><i class="bi bi-star"></i></div>
-                    <div class="admin-stat-value">{{ $adminPlatformRating ? number_format($adminPlatformRating, 1, ',', '.') : '—' }}</div>
-                    <div class="admin-stat-label">Média da plataforma</div>
+                    <div class="admin-stat-icon mb-3"><i class="bi bi-wallet2"></i></div>
+                    <div class="admin-stat-value">{{ $adminPaymentPendingCount }}</div>
+                    <div class="admin-stat-label">Pagamentos pendentes</div>
                 </div>
             </div>
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="admin-stat">
                     <div class="admin-stat-icon mb-3"><i class="bi bi-cash-stack"></i></div>
                     <div class="admin-stat-value" style="font-size:1.15rem;">R$ {{ number_format($adminPaidTotal, 2, ',', '.') }}</div>
-                    <div class="admin-stat-label">Receita de pagamentos</div>
+                    <div class="admin-stat-label">Receita total</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="admin-stat">
+                    <div class="admin-stat-icon mb-3"><i class="bi bi-star"></i></div>
+                    <div class="admin-stat-value">{{ $adminPlatformRating ? number_format($adminPlatformRating, 1, ',', '.') : '—' }}</div>
+                    <div class="admin-stat-label">Avaliação média</div>
                 </div>
             </div>
         </div>
@@ -241,20 +229,12 @@
                     </div>
                     <div class="p-3">
                         <div class="admin-row px-0">
-                            <span class="admin-row-meta">Clientes</span>
-                            <strong>{{ $adminClientCount }}</strong>
-                        </div>
-                        <div class="admin-row px-0">
                             <span class="admin-row-meta">Agendamentos confirmados</span>
                             <strong>{{ $adminConfirmedCount }}</strong>
                         </div>
                         <div class="admin-row px-0">
                             <span class="admin-row-meta">Agendamentos cancelados</span>
                             <strong>{{ $adminCanceledCount }}</strong>
-                        </div>
-                        <div class="admin-row px-0">
-                            <span class="admin-row-meta">Pagamentos pendentes</span>
-                            <strong class="text-warning">{{ $adminPaymentPendingCount }}</strong>
                         </div>
                         <div class="d-grid gap-2 mt-3">
                             <a href="{{ route('users.index') }}" class="admin-action"><i class="bi bi-people"></i>Gerenciar usuários</a>
@@ -274,7 +254,6 @@
         $clientPendingPayments = \App\Models\Pagamento::whereHas('agendamento', function ($query) use ($client) {
             $query->where('id_user_cliente', $client->id);
         })->where('status_pagamento', 'pendente')->count();
-        $availableSitters = \App\Models\User::where('role', 'PRO')->whereHas('disponibilidades')->count();
         $clientUpcoming = \App\Models\Agendamento::with(['pet', 'sitter', 'servico'])
             ->where('id_user_cliente', $client->id)
             ->whereIn('status', ['pendente', 'confirmado'])
@@ -296,6 +275,7 @@
             border-radius: 14px;
             height: 100%;
             padding: 1.1rem;
+            width: 100%;
         }
         .client-dashboard .client-stat-icon {
             align-items: center;
@@ -380,10 +360,9 @@
         </div>
 
         <div class="row g-3 mb-4">
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-heart"></i></div><div class="client-stat-value">{{ $clientPets }}</div><div class="client-stat-label">Meus pets</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-calendar3"></i></div><div class="client-stat-value">{{ $clientAppointments }}</div><div class="client-stat-label">Meus agendamentos</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-person-check"></i></div><div class="client-stat-value">{{ $availableSitters }}</div><div class="client-stat-label">Sitters disponíveis</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-wallet2"></i></div><div class="client-stat-value">{{ $clientPendingPayments }}</div><div class="client-stat-label">Pagamentos pendentes</div></div></div>
+            <div class="col-12 col-md-4"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-heart"></i></div><div class="client-stat-value">{{ $clientPets }}</div><div class="client-stat-label">Meus pets</div></div></div>
+            <div class="col-12 col-md-4"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-calendar3"></i></div><div class="client-stat-value">{{ $clientAppointments }}</div><div class="client-stat-label">Meus agendamentos</div></div></div>
+            <div class="col-12 col-md-4"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-wallet2"></i></div><div class="client-stat-value">{{ $clientPendingPayments }}</div><div class="client-stat-label">Pagamentos pendentes</div></div></div>
         </div>
 
         <div class="row g-4">
@@ -439,22 +418,43 @@
     @endphp
 
     <div class="client-dashboard pro-dashboard">
-        <div class="client-hero rounded-4 p-4 mb-4">
-            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-                <div>
-                    <div class="text-muted small mb-1">Minha área profissional</div>
-                    <h4 class="mb-2" style="color:#1C1917;">Olá, {{ $pro->name }}!</h4>
-                    <p class="text-muted mb-0" style="font-size:.88rem;">Acompanhe seus atendimentos e mantenha sua agenda organizada.</p>
-                </div>
-                <i class="bi bi-person-check-fill" style="font-size:2rem;color:#ea580c;"></i>
-            </div>
-        </div>
-
         <div class="row g-3 mb-4">
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-hourglass-split"></i></div><div class="client-stat-value">{{ $proPending }}</div><div class="client-stat-label">Solicitações pendentes</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-calendar-check"></i></div><div class="client-stat-value">{{ $proConfirmed }}</div><div class="client-stat-label">Atendimentos confirmados</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-check2-circle"></i></div><div class="client-stat-value">{{ $proCompleted }}</div><div class="client-stat-label">Atendimentos concluídos</div></div></div>
-            <div class="col-6 col-xl-3"><div class="client-stat"><div class="client-stat-icon mb-3"><i class="bi bi-star-fill"></i></div><div class="client-stat-value">{{ $proAverage ? number_format($proAverage, 1, ',', '.') : '—' }}</div><div class="client-stat-label">Avaliação média</div></div></div>
+            <div class="col-6 col-xl-3">
+                <div class="client-stat">
+                    <div class="client-stat-icon mb-3">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div class="client-stat-value">{{ $proPending }}</div>
+                    <div class="client-stat-label">Solicitações pendentes</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="client-stat">
+                    <div class="client-stat-icon mb-3">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="client-stat-value">{{ $proConfirmed }}</div>
+                    <div class="client-stat-label">Atendimentos confirmados</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="client-stat">
+                    <div class="client-stat-icon mb-3">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div class="client-stat-value">{{ $proCompleted }}</div>
+                    <div class="client-stat-label">Atendimentos concluídos</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="client-stat">
+                    <div class="client-stat-icon mb-3">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <div class="client-stat-value">{{ $proAverage ? number_format($proAverage, 1, ',', '.') : '—' }}</div>
+                    <div class="client-stat-label">Avaliação média</div>
+                </div>
+            </div>
         </div>
 
         <div class="row g-4">

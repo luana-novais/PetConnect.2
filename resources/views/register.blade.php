@@ -178,9 +178,20 @@
                         </label>
                         <input type="text" id="endereco" name="endereco"
                                class="form-control @error('endereco') is-invalid @enderror"
-                               placeholder="Rua, número, complemento"
+                               placeholder="Rua, número"
                                value="{{ old('endereco') }}">
                         @error('endereco')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="complemento" class="form-label">
+                            <i class="bi bi-house-door me-1"></i>Complemento
+                        </label>
+                        <input type="text" id="complemento" name="complemento"
+                               class="form-control @error('complemento') is-invalid @enderror"
+                               placeholder="Apartamento, bloco, casa, etc."
+                               value="{{ old('complemento') }}">
+                        @error('complemento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="row g-2">

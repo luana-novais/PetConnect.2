@@ -14,11 +14,13 @@ class Servico extends Model
     protected $fillable = [
         'nome',
         'valor_servico',
+        'duracao_minutos',
         'id_user',
     ];
 
     protected $casts = [
         'valor_servico' => 'decimal:2',
+        'duracao_minutos' => 'integer',
     ];
 
     // Relacionamentos

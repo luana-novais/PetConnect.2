@@ -55,6 +55,15 @@
                             <input type="number" step="0.01" min="0" name="valor_servico" class="form-control @error('valor_servico') is-invalid @enderror" value="{{ old('valor_servico', $servicos->valor_servico) }}" required>
                             @error('valor_servico')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Duração do Serviço</label>
+                            <div class="input-group">
+                                <input type="number" step="15" min="15" max="720" name="duracao_minutos" class="form-control @error('duracao_minutos') is-invalid @enderror" value="{{ old('duracao_minutos', $servicos->duracao_minutos ?? 60) }}" required>
+                                <span class="input-group-text">min</span>
+                            </div>
+                            @error('duracao_minutos')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
                     </div>
 
             <div class="d-flex gap-2 justify-content-end">
