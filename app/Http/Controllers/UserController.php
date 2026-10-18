@@ -54,6 +54,7 @@ class UserController extends Controller
             'password.confirmed' => 'As senhas não correspondem.',
             'role.required'      => 'Selecione um tipo de usuário.',
             'role.in'            => 'Perfil inválido.',
+            'foto.mimes'         => 'A foto deve estar nos formatos JPG ou PNG.',
         ]);
 
         try {
@@ -149,6 +150,8 @@ class UserController extends Controller
             'current_password' => 'nullable',
             'password'         => 'nullable|min:8|confirmed',
             'foto'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'foto.mimes' => 'A foto deve estar nos formatos JPG ou PNG.',
         ]);
 
         try {

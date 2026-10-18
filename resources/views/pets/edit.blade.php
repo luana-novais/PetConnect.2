@@ -182,9 +182,9 @@
                 <div class="card-header"><i class="bi bi-camera me-2 text-warning"></i>Foto do Pet</div>
                 <div class="card-body">
                           <label for="fotos" class="form-label">Adicionar imagens</label>
-                          <input type="file" id="fotos" name="fotos[]" accept="image/jpeg,image/png,image/webp"
+                          <input type="file" id="fotos" name="fotos[]" accept="image/jpeg,image/png"
                               class="form-control @error('fotos.*') is-invalid @enderror" multiple>
-                          <div class="form-text">Você pode adicionar várias imagens JPG, PNG ou WEBP, até 5 MB cada.</div>
+                          <div class="form-text">Você pode adicionar várias imagens JPG ou PNG, até 5 MB cada.</div>
                           @error('fotos')<div class="invalid-feedback">{{ $message }}</div>@enderror
                           @error('fotos.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>

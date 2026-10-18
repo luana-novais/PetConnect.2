@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     // Rotas AJAX de agendamento — DEVEM vir antes do resource para não
     // serem interceptadas como {agendamento} pelo Laravel
     Route::get('/agendamentos/search/sitters', [AgendamentoController::class, 'searchSittersByLocation'])->name('agendamentos.searchSitters');
+    Route::get('/agendamentos/search/service-sitters', [AgendamentoController::class, 'searchSittersByService'])->name('agendamentos.searchSittersByService');
     Route::get('/agendamentos/availability/sitter', [AgendamentoController::class, 'getSitterAvailability'])->name('agendamentos.getSitterAvailability');
 
     // Ações personalizadas de agendamento

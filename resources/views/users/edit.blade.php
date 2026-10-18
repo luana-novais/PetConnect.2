@@ -77,9 +77,9 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" style="font-size:.78rem;" for="foto">Foto do usuário</label>
-                            <input type="file" name="foto" id="foto" accept="image/jpeg,image/png,image/webp"
+                            <input type="file" name="foto" id="foto" accept="image/jpeg,image/png"
                                    class="form-control @error('foto') is-invalid @enderror">
-                            <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
+                            <div class="form-text">JPG ou PNG, até 5 MB.</div>
                             @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>

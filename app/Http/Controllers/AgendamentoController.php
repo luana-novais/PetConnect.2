@@ -15,21 +15,34 @@ use App\Models\FotoPet;
 
 class AgendamentoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->concluirAgendamentosExpirados();
 
+        $filters = $request->validate([
+            'status' => 'nullable|in:pendente,confirmado,cancelado,concluido',
+            'data' => 'nullable|date_format:Y-m-d',
+        ]);
+
+        $query = Agendamento::with(['cliente','pet','sitter','servico','pagamento']);
+
         if (auth()->user()->role === 'ADM') {
-            $agendamentos = Agendamento::with(['cliente','pet','sitter','servico','pagamento'])->get();
+            // Administradores podem consultar todos os agendamentos.
         } elseif (auth()->user()->role === 'CLI') {
-            $agendamentos = Agendamento::with(['cliente','pet','sitter','servico','pagamento'])
-                ->where('id_user_cliente', auth()->id())
-                ->get();
+            $query->where('id_user_cliente', auth()->id());
         } else {
-            $agendamentos = Agendamento::with(['cliente','pet','sitter','servico','pagamento'])
-                ->where('id_user_sitter', auth()->id())
-                ->get();
+            $query->where('id_user_sitter', auth()->id());
         }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['data'])) {
+            $query->whereDate('data_inicio', $filters['data']);
+        }
+
+        $agendamentos = $query->get();
 
         return view('agendamentos.index', compact('agendamentos'));
     }
@@ -76,10 +89,53 @@ class AgendamentoController extends Controller
     {
         $clientes = Auth::user() ? [Auth::user()] : [];
         $pets = Auth::user() ? Auth::user()->pets : [];
-        $servicos = Servico::all();
-        $selectedSitter = $request->filled('sitter_id') ? User::find($request->sitter_id) : null;
+        $selectedSitter = $request->filled('sitter_id')
+            ? User::where('role', 'PRO')->find($request->sitter_id)
+            : null;
 
-        return view('agendamentos.create', compact('clientes', 'pets', 'servicos', 'selectedSitter'));
+        $servicosQuery = Servico::whereNotNull('id_user')
+            ->whereHas('user', fn ($query) => $query->where('role', 'PRO'));
+
+        if ($selectedSitter) {
+            $servicosQuery->where('id_user', $selectedSitter->id);
+        }
+
+        $servicos = $servicosQuery->orderBy('nome')->get()->unique('nome')->values();
+        $oldServiceId = $request->session()->getOldInput('id_servico');
+        $selectedServiceName = $oldServiceId
+            ? Servico::whereKey($oldServiceId)->value('nome')
+            : null;
+
+        return view('agendamentos.create', compact('clientes', 'pets', 'servicos', 'selectedSitter', 'selectedServiceName'));
+    }
+
+    public function searchSittersByService(Request $request)
+    {
+        $data = $request->validate([
+            'service_id' => 'required|exists:servicos,id',
+            'sitter_id' => 'nullable|exists:users,id',
+        ]);
+
+        $service = Servico::findOrFail($data['service_id']);
+        $offerings = Servico::with('user')
+            ->where('nome', $service->nome)
+            ->whereNotNull('id_user')
+            ->whereHas('user', fn ($query) => $query->where('role', 'PRO'))
+            ->when($data['sitter_id'] ?? null, fn ($query, $sitterId) => $query->where('id_user', $sitterId))
+            ->orderBy('valor_servico')
+            ->get()
+            ->unique('id_user')
+            ->values()
+            ->map(fn ($offering) => [
+                'service_id' => $offering->id,
+                'service_name' => $offering->nome,
+                'sitter_id' => $offering->id_user,
+                'sitter_name' => $offering->user->name,
+                'price' => $offering->valor_servico,
+                'duration' => $offering->duracao_minutos ?? 60,
+            ]);
+
+        return response()->json($offerings);
     }
 
     /**
@@ -177,6 +233,11 @@ class AgendamentoController extends Controller
             return redirect()->back()->withInput()->with('error', 'O usuário selecionado não é um pet sitter válido.');
         }
 
+        $servico = Servico::findOrFail($request->id_servico);
+        if ((int) $servico->id_user !== (int) $sitter->id) {
+            return redirect()->back()->withInput()->with('error', 'O serviço selecionado não é oferecido pelo pet sitter escolhido.');
+        }
+
         $inicio = Carbon::createFromFormat('Y-m-d\TH:i', $request->data_inicio);
         $fim    = Carbon::createFromFormat('Y-m-d\TH:i', $request->data_fim);
 
@@ -236,7 +297,7 @@ class AgendamentoController extends Controller
             'fotos.required' => 'Selecione pelo menos uma foto.',
             'fotos.max' => 'Você pode enviar no máximo 10 fotos por vez.',
             'fotos.*.image' => 'Todos os arquivos devem ser imagens.',
-            'fotos.*.mimes' => 'As fotos devem estar nos formatos JPG, PNG ou WEBP.',
+            'fotos.*.mimes' => 'As fotos devem estar nos formatos JPG ou PNG.',
             'fotos.*.max' => 'Cada foto pode ter no máximo 5 MB.',
         ]);
 
@@ -371,14 +432,17 @@ class AgendamentoController extends Controller
 
     /**
      * Cancelar agendamento (F_F04)
-     * Apenas o cliente dono ou ADM pode cancelar.
+     * O cliente dono, o sitter responsável ou ADM pode cancelar.
      */
     public function cancel($id)
     {
         $agendamento = Agendamento::findOrFail($id);
 
         $user = auth()->user();
-        if ($user->role !== 'ADM' && $agendamento->id_user_cliente !== $user->id) {
+        $isClienteDono = $user->role === 'CLI' && $agendamento->id_user_cliente === $user->id;
+        $isSitterResponsavel = $user->role === 'PRO' && $agendamento->id_user_sitter === $user->id;
+
+        if ($user->role !== 'ADM' && !$isClienteDono && !$isSitterResponsavel) {
             abort(403);
         }
 

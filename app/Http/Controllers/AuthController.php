@@ -86,6 +86,7 @@ class AuthController extends Controller
             'password.min'       => 'A senha deve ter pelo menos 6 caracteres.',
             'password.confirmed' => 'As senhas não correspondem.',
             'role.required'      => 'Selecione um tipo de usuário.',
+            'foto.mimes'         => 'A foto deve estar nos formatos JPG ou PNG.',
         ]);
 
         $user = User::create([

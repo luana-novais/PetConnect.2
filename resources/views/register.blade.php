@@ -163,9 +163,9 @@
 
                     <div class="form-group">
                         <label for="foto" class="form-label"><i class="bi bi-camera me-1"></i>Foto do usuário</label>
-                        <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp"
+                        <input type="file" id="foto" name="foto" accept="image/jpeg,image/png"
                                class="form-control @error('foto') is-invalid @enderror">
-                        <small class="text-muted">JPG, PNG ou WEBP, até 5 MB.</small>
+                        <small class="text-muted">JPG ou PNG, até 5 MB.</small>
                         @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 

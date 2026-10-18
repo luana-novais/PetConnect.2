@@ -269,9 +269,9 @@
                 @csrf
                 <label for="fotos-atendimento" class="form-label">Adicionar fotos tiradas durante o atendimento</label>
                 <input type="file" id="fotos-atendimento" name="fotos[]" multiple
-                       accept="image/jpeg,image/png,image/webp"
+                       accept="image/jpeg,image/png"
                        class="form-control @error('fotos') is-invalid @enderror @error('fotos.*') is-invalid @enderror">
-                <div class="form-text">JPG, PNG ou WEBP, até 5 MB cada. Você pode selecionar várias fotos.</div>
+                <div class="form-text">JPG ou PNG, até 5 MB cada. Você pode selecionar várias fotos.</div>
                 @error('fotos')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 @error('fotos.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 <button type="submit" class="btn btn-primary btn-sm mt-3">

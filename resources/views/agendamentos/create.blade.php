@@ -291,12 +291,12 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label for="id_servico" class="form-label">Serviço Desejado <span class="text-danger">*</span></label>
-                            <select id="id_servico" name="id_servico" onchange="onServiceSelected()"
+                            <select id="serviceChoice" onchange="onServiceSelected()"
                                     class="form-select @error('id_servico') is-invalid @enderror" required>
                                 <option value="">Selecione um serviço...</option>
                                 @foreach($servicos as $servico)
-                                    <option value="{{ $servico->id }}" data-duracao="{{ $servico->duracao_minutos ?? 60 }}" {{ old('id_servico') == $servico->id ? 'selected' : '' }}>
-                                        {{ $servico->nome }} - R$ {{ number_format($servico->valor_servico, 2, ',', '.') }}
+                                    <option value="{{ $servico->id }}" {{ $selectedServiceName === $servico->nome ? 'selected' : '' }}>
+                                        {{ $servico->nome }}
                                     </option>
                                 @endforeach
                             </select>
@@ -308,12 +308,32 @@
                 </div>
             </div>
 
-            {{-- Sitter selecionado na rota anterior --}}
-            <input type="hidden"
-                   id="id_user_sitter"
-                   name="id_user_sitter"
-                   value="{{ old('id_user_sitter', request('sitter_id', $selectedSitter?->id)) }}"
-                   data-sitter-name="{{ old('sitter_name', $selectedSitter?->name ?? '') }}">
+            <input type="hidden" id="id_servico" name="id_servico" value="{{ old('id_servico') }}">
+
+            {{-- PASSO 3: Selecionar sitter que oferece o serviço --}}
+            <div class="card mb-4" id="sitterCard" style="display: none;">
+                <div class="card-header">
+                    <div class="step-indicator">
+                        <div class="step-circle" id="step3-circle">3</div>
+                        <div><i class="bi bi-person-badge me-2 text-primary"></i>Selecionar Pet Sitter</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <label for="id_user_sitter" class="form-label">Sitters que oferecem este serviço <span class="text-danger">*</span></label>
+                    <select id="id_user_sitter"
+                            name="id_user_sitter"
+                            class="form-select @error('id_user_sitter') is-invalid @enderror"
+                            data-preferred-sitter-id="{{ old('id_user_sitter', $selectedSitter?->id) }}"
+                            onchange="onSitterSelected()"
+                            disabled
+                            required>
+                        <option value="">Selecione um serviço primeiro...</option>
+                    </select>
+                    @error('id_user_sitter')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
 
             {{-- PASSO 4: Verificar Disponibilidade do Sitter (F_F03) --}}
             <div class="card mb-4" id="availabilityCard" style="display: none;">
@@ -430,6 +450,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const sitterInput = document.getElementById('id_user_sitter');
+    const serviceChoice = document.getElementById('serviceChoice');
     const availabilityCard = document.getElementById('availabilityCard');
     let selectedServiceDuration = 60;
     const dateTimeCard = document.getElementById('dateTimeCard');
@@ -438,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const availabilityGrid = document.getElementById('availabilityGrid');
     const noAvailability = document.getElementById('noAvailability');
     const servicoCard = document.getElementById('servicoCard');
+    const sitterCard = document.getElementById('sitterCard');
 
     window.onPetSelected = function() {
         const petSelect = document.getElementById('id_pet');
@@ -449,51 +471,101 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    function resetSchedule() {
+        document.getElementById('id_servico').value = '';
+        document.getElementById('data_inicio').value = '';
+        document.getElementById('data_fim').value = '';
+        availabilityCard.style.display = 'none';
+        dateTimeCard.style.display = 'none';
+        confirmCard.style.display = 'none';
+        submitButtons.style.display = 'none';
+        availabilityGrid.innerHTML = '';
+        document.getElementById('slotContainer').innerHTML = '';
+    }
+
     window.onServiceSelected = function() {
-        const serviceSelect = document.getElementById('id_servico');
-        const serviceId = serviceSelect.value;
-        const preferredSitterId = new URLSearchParams(window.location.search).get('sitter_id');
+        resetSchedule();
+        sitterInput.innerHTML = '<option value="">Carregando sitters...</option>';
+        sitterInput.disabled = true;
 
-        if (!serviceId) {
+        if (!serviceChoice.value) {
+            sitterCard.style.display = 'none';
+            document.getElementById('step2-circle').classList.remove('completed');
             return;
         }
 
-        const selectedOption = serviceSelect.selectedOptions[0];
-        selectedServiceDuration = Number(selectedOption?.dataset.duracao || 60);
         document.getElementById('step2-circle').classList.add('completed');
+        sitterCard.style.display = 'block';
 
-        if (!preferredSitterId) {
-            alert('Selecione um sitter na página dos profissionais para continuar o agendamento.');
+        const params = new URLSearchParams({ service_id: serviceChoice.value });
+        const preferredSitterId = sitterInput.dataset.preferredSitterId;
+        if (preferredSitterId) {
+            params.set('sitter_id', preferredSitterId);
+        }
+
+        fetch(`{{ route('agendamentos.searchSittersByService') }}?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Não foi possível buscar os sitters.');
+                return response.json();
+            })
+            .then(sitters => {
+                sitterInput.innerHTML = '<option value="">Selecione um sitter...</option>';
+
+                sitters.forEach(sitter => {
+                    const price = Number(sitter.price).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    const option = new Option(`${sitter.sitter_name} - R$ ${price}`, sitter.sitter_id);
+                    option.dataset.serviceId = sitter.service_id;
+                    option.dataset.duration = sitter.duration || 60;
+                    sitterInput.add(option);
+                });
+
+                if (!sitters.length) {
+                    sitterInput.add(new Option('Nenhum sitter oferece este serviço', ''));
+                }
+
+                sitterInput.disabled = sitters.length === 0;
+                const preferredOption = Array.from(sitterInput.options).find(option =>
+                    option.value === preferredSitterId
+                );
+                if (preferredOption) {
+                    sitterInput.value = preferredSitterId;
+                    window.onSitterSelected();
+                }
+            })
+            .catch(error => {
+                sitterInput.innerHTML = '<option value="">Erro ao carregar sitters</option>';
+                console.error(error);
+            });
+    };
+
+    window.onSitterSelected = function() {
+        const selectedOption = sitterInput.selectedOptions[0];
+        if (!selectedOption?.dataset.serviceId) {
+            resetSchedule();
             return;
         }
 
-        sitterInput.value = preferredSitterId;
-        const step3 = document.getElementById('step3-circle');
-        if (step3) {
-            step3.classList.add('completed');
-        }
+        resetSchedule();
+        document.getElementById('id_servico').value = selectedOption.dataset.serviceId;
+        selectedServiceDuration = Number(selectedOption.dataset.duration || 60);
+        document.getElementById('step3-circle').classList.add('completed');
         document.getElementById('step4-circle').classList.add('active');
         availabilityCard.style.display = 'block';
-        loadSitterAvailability(preferredSitterId);
+        loadSitterAvailability(sitterInput.value);
 
         setTimeout(() => {
             availabilityCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 150);
     };
 
-    const preferredSitterId = new URLSearchParams(window.location.search).get('sitter_id');
-    if (preferredSitterId) {
-        sitterInput.value = preferredSitterId;
-        const step3 = document.getElementById('step3-circle');
-        if (step3) {
-            step3.classList.add('completed');
-        }
-        document.getElementById('step4-circle').classList.add('active');
-        availabilityCard.style.display = 'block';
-        loadSitterAvailability(preferredSitterId);
-        setTimeout(() => {
-            availabilityCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 150);
+    if (document.getElementById('id_pet').value) {
+        window.onPetSelected();
+    }
+    if (serviceChoice.value) {
+        window.onServiceSelected();
     }
 
     // PASSO 5: Carregar disponibilidade do sitter (F_F03)
@@ -665,11 +737,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateSummary() {
         const petSelect = document.getElementById('id_pet');
         const petName = petSelect.options[petSelect.selectedIndex]?.text || 'Nenhum pet selecionado';
-        const serviceSelect = document.getElementById('id_servico');
+        const serviceSelect = serviceChoice;
         const dataInicio = document.getElementById('data_inicio').value;
         const dataFim = document.getElementById('data_fim').value;
         const sitterInput = document.getElementById('id_user_sitter');
-        const sitterName = sitterInput?.dataset?.sitterName || document.querySelector('.sitter-card.selected strong')?.textContent || 'N/A';
+        const sitterName = sitterInput.options[sitterInput.selectedIndex]?.text || 'N/A';
 
         const summary = `
             <div class="col-md-6">

@@ -103,6 +103,37 @@
     @endif
 </div>
 
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <form method="GET" action="{{ route('agendamentos.index') }}" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="status" class="form-label mb-1">Filtrar por status</label>
+                <select name="status" id="status" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="pendente" @selected(request('status') === 'pendente')>Pendente</option>
+                    <option value="confirmado" @selected(request('status') === 'confirmado')>Confirmado</option>
+                    <option value="cancelado" @selected(request('status') === 'cancelado')>Cancelado</option>
+                    <option value="concluido" @selected(request('status') === 'concluido')>Concluído</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="data" class="form-label mb-1">Filtrar por data</label>
+                <input type="date" name="data" id="data" class="form-control form-control-sm" value="{{ request('data') }}">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-funnel me-1"></i> Filtrar
+                </button>
+                @if(request()->hasAny(['status', 'data']))
+                    <a href="{{ route('agendamentos.index') }}" class="btn btn-outline-secondary btn-sm" aria-label="Limpar filtros" title="Limpar filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+</div>
+
 @if($agendamentos->isEmpty())
     <div class="text-center py-5">
         <div style="font-size:3.5rem;">📅</div>

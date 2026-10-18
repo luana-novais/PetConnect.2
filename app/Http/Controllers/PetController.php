@@ -53,6 +53,8 @@ class PetController extends Controller
             'observacoes'     => 'nullable|string|max:1000',
             'fotos'           => 'nullable|array|max:10',
             'fotos.*'         => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'fotos.*.mimes'   => 'As imagens devem estar nos formatos JPG ou PNG.',
         ]);
 
         try {
@@ -136,6 +138,8 @@ class PetController extends Controller
             'observacoes'     => 'nullable|string|max:1000',
             'fotos'           => 'nullable|array|max:10',
             'fotos.*'         => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'fotos.*.mimes'   => 'As imagens devem estar nos formatos JPG ou PNG.',
         ]);
 
         try {
