@@ -42,7 +42,10 @@
                 {{-- Foto principal ou avatar padrão --}}
                 @if($fotos->isNotEmpty())
                     <img src="{{ asset('storage/' . $fotos->first()->url_foto) }}"
-                         alt="Foto de {{ $pet->nome }}" class="pet-avatar-lg pet-avatar-image">
+                         alt="Foto de {{ $pet->nome }}"
+                         class="pet-avatar-lg pet-avatar-image image-preview-trigger"
+                         tabindex="0" role="button" aria-haspopup="dialog"
+                         aria-label="Ampliar foto de {{ $pet->nome }}">
                 @else
                     <div class="pet-avatar-lg">
                         {{ $pet->especie->tipo_pet === 'GATO' ? '🐱' : ($pet->especie->tipo_pet === 'CACHORRO' ? '🐶' : '🐾') }}
@@ -164,26 +167,89 @@
         @endif
 
         {{-- Fotos --}}
-        @if($fotos->isNotEmpty())
         <div class="card mb-4 pet-detail-card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-images me-2 text-warning"></i>Fotos do Pet</span>
                 <span class="pet-gallery-count">{{ $fotos->count() }}</span>
             </div>
             <div class="card-body pet-gallery-body">
-                <div class="row g-3 pet-gallery">
-                    @foreach($fotos as $foto)
-                        <div class="col-sm-6 col-md-4 pet-gallery-item">
-                            <img src="{{ asset('storage/' . $foto->url_foto) }}"
-                                 alt="{{ $foto->nome_arquivo }}"
-                                 class="img-fluid rounded w-100"
-                                 loading="lazy">
+                @if($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        @foreach($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form action="{{ route('pets.photos.store', $pet) }}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      class="pet-photo-upload-form mb-4">
+                    @csrf
+                    <div class="pet-photo-upload">
+                        <div class="pet-photo-upload-content">
+                            <span class="pet-photo-upload-icon"><i class="bi bi-cloud-arrow-up"></i></span>
+                            <div class="pet-photo-upload-copy">
+                                <span class="pet-photo-upload-title">Adicionar fotos</span>
+                                <span class="pet-photo-upload-help">JPG, PNG ou WebP · até 5 MB por foto · máximo de 10</span>
+                            </div>
                         </div>
-                    @endforeach
-                </div>
+                        <div class="pet-photo-upload-actions">
+                            <input type="file"
+                                   id="pet-photos"
+                                   name="fotos[]"
+                                   class="pet-photo-file-input"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   multiple
+                                   required>
+                            <label for="pet-photos" class="pet-photo-select-button">
+                                <i class="bi bi-images me-1"></i>Selecionar
+                            </label>
+                            <span id="pet-photo-selection" class="pet-photo-selection">Nenhuma selecionada</span>
+                            <button type="submit" class="btn btn-primary pet-photo-submit-button">
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                @if($fotos->isNotEmpty())
+                    <div class="row g-3 pet-gallery">
+                        @foreach($fotos as $foto)
+                            <div class="col-sm-6 col-md-4 pet-gallery-item">
+                                <div class="pet-photo-card">
+                                    <img src="{{ asset('storage/' . $foto->url_foto) }}"
+                                         alt="{{ $foto->nome_arquivo }}"
+                                         class="pet-photo-image image-preview-trigger"
+                                         tabindex="0" role="button" aria-haspopup="dialog"
+                                         aria-label="Ampliar {{ $foto->nome_arquivo }}"
+                                         loading="lazy">
+                                    <div class="pet-photo-unavailable" hidden>
+                                        <i class="bi bi-image-alt"></i>
+                                        <span>Foto indisponível</span>
+                                    </div>
+                                    <form action="{{ route('pets.photos.destroy', [$pet, $foto]) }}"
+                                          method="POST"
+                                          class="pet-photo-delete-form"
+                                          onsubmit="return confirm('Excluir esta foto do pet?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="pet-photo-delete-button"
+                                                aria-label="Excluir foto {{ $foto->nome_arquivo }}"
+                                                title="Excluir foto">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted mb-0">Este pet ainda não tem fotos.</p>
+                @endif
             </div>
         </div>
-        @endif
 
         {{-- Histórico de agendamentos --}}
         <div class="card pet-detail-card table-card">
@@ -254,3 +320,32 @@
 </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+        const petPhotosInput = document.getElementById('pet-photos');
+        const petPhotoSelection = document.getElementById('pet-photo-selection');
+
+        if (petPhotosInput && petPhotoSelection) {
+            petPhotosInput.addEventListener('change', function () {
+                const count = this.files.length;
+                petPhotoSelection.textContent = count === 0
+                    ? 'Nenhuma selecionada'
+                    : `${count} ${count === 1 ? 'foto selecionada' : 'fotos selecionadas'}`;
+            });
+        }
+
+        document.querySelectorAll('.pet-photo-image').forEach(function (image) {
+            const showUnavailable = function () {
+                image.hidden = true;
+                image.parentElement.querySelector('.pet-photo-unavailable').hidden = false;
+            };
+
+            image.addEventListener('error', showUnavailable);
+
+            if (image.complete && image.naturalWidth === 0) {
+                showUnavailable();
+            }
+        });
+    </script>
+@endpush

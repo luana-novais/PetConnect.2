@@ -147,15 +147,26 @@ class UserController extends Controller
             'cidade'           => 'nullable|string|max:100',
             'estado'           => 'nullable|string|max:100',
             'cep'              => 'nullable|string|max:10',
-            'current_password' => 'nullable',
-            'password'         => 'nullable|min:8|confirmed',
+            'current_password' => ['nullable', 'required_with:password'],
+            'password'         => ['nullable', 'string', 'min:8', 'confirmed', 'required_with:current_password'],
             'foto'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ], [
+            'current_password.required_with' => 'Informe sua senha atual para alterar a senha.',
+            'password.required_with' => 'Informe a nova senha.',
+            'password.string' => 'A nova senha precisa ser válida.',
+            'password.min' => 'A nova senha deve ter pelo menos 8 caracteres.',
+            'password.confirmed' => 'A confirmação da nova senha não confere.',
             'foto.mimes' => 'A foto deve estar nos formatos JPG ou PNG.',
         ]);
 
         try {
             $user = User::findOrFail($id);
+
+            if ($request->filled('current_password') && !Hash::check($request->current_password, $user->password)) {
+                return back()
+                    ->withErrors(['current_password' => 'A senha atual está incorreta.'])
+                    ->withInput($request->except(['current_password', 'password', 'password_confirmation']));
+            }
 
             $user->update([
                 'name'  => $request->name,
@@ -177,12 +188,7 @@ class UserController extends Controller
                 }
             }
 
-            if ($request->filled('current_password')) {
-                if (!Hash::check($request->current_password, $user->password)) {
-                    return back()
-                        ->withErrors(['current_password' => 'A senha atual está incorreta.'])
-                        ->withInput();
-                }
+            if ($request->filled('password')) {
                 $user->update(['password' => bcrypt($request->password)]);
             }
 
@@ -209,22 +215,39 @@ class UserController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if (auth()->user()->role !== 'ADM') {
+        $authUser = auth()->user();
+        $user = User::findOrFail($id);
+        $isSelf = (int) $authUser->id === (int) $user->id;
+
+        if ($authUser->role !== 'ADM' && !$isSelf) {
             abort(403);
         }
 
         try {
-            $user = User::findOrFail($id);
+            foreach ($user->fotosUsuarios as $foto) {
+                Storage::disk('public')->delete($foto->url_foto);
+                $foto->delete();
+            }
+
             Telefone::where('id_user', $id)->delete();
             Endereco::where('id_user', $id)->delete();
             $user->delete();
 
-            return redirect()->route('users.index')->with('success', 'Usuário deletado com sucesso!');
         } catch (Exception $e) {
             Log::error('Erro ao deletar usuário: ' . $e->getMessage(), ['stack' => $e->getTraceAsString()]);
             return redirect()->back()->with('error', 'Erro ao deletar: ' . $e->getMessage());
         }
+
+        if ($isSelf) {
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('home')->with('success', 'Sua conta foi excluída com sucesso.');
+        }
+
+        return redirect()->route('users.index')->with('success', 'Usuário deletado com sucesso!');
     }
 }

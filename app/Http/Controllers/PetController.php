@@ -8,9 +8,12 @@ use App\Models\Raca;
 use App\Models\User;
 use App\Models\FotoPet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use RuntimeException;
+use Throwable;
 
 class PetController extends Controller
 {
@@ -116,6 +119,74 @@ class PetController extends Controller
         return view('pets.show', compact('pet', 'fotos'));
     }
 
+    public function storePhotos(Request $request, Pet $pet)
+    {
+        $this->authorizePetAccess($pet);
+
+        $request->validate([
+            'fotos' => ['required', 'array', 'min:1', 'max:10'],
+            'fotos.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'fotos.required' => 'Selecione ao menos uma foto.',
+            'fotos.min' => 'Selecione ao menos uma foto.',
+            'fotos.max' => 'É possível enviar no máximo 10 fotos por vez.',
+            'fotos.*.image' => 'Cada arquivo deve ser uma imagem válida.',
+            'fotos.*.mimes' => 'As imagens devem estar nos formatos JPG, PNG ou WebP.',
+            'fotos.*.max' => 'Cada imagem deve ter no máximo 5 MB.',
+        ]);
+
+        $storedPaths = [];
+
+        try {
+            DB::transaction(function () use ($request, $pet, &$storedPaths): void {
+                foreach ($request->file('fotos', []) as $arquivo) {
+                    $path = $arquivo->store('fotos/pets', 'public');
+
+                    if ($path === false) {
+                        throw new RuntimeException('Não foi possível salvar uma das fotos enviadas.');
+                    }
+
+                    $storedPaths[] = $path;
+
+                    FotoPet::create([
+                        'id_pet' => $pet->id,
+                        'nome_arquivo' => $arquivo->getClientOriginalName(),
+                        'url_foto' => $path,
+                    ]);
+                }
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($storedPaths);
+            throw $exception;
+        }
+
+        return redirect()->route('pets.show', $pet)->with('success', 'Fotos adicionadas ao pet com sucesso.');
+    }
+
+    public function destroyPhoto(Pet $pet, FotoPet $foto)
+    {
+        $this->authorizePetAccess($pet);
+
+        $belongsToPet = $foto->id_agendamento === null
+            && ((int) $foto->id_pet === (int) $pet->id || (int) $pet->id_foto === (int) $foto->id);
+
+        if (!$belongsToPet) {
+            abort(404);
+        }
+
+        $path = $foto->url_foto;
+
+        if ((int) $pet->id_foto === (int) $foto->id) {
+            $pet->foto()->dissociate();
+            $pet->save();
+        }
+
+        $foto->delete();
+        Storage::disk('public')->delete($path);
+
+        return redirect()->route('pets.show', $pet)->with('success', 'Foto excluída com sucesso.');
+    }
+
     public function edit($id)
     {
         $pet  = Pet::findOrFail($id);
@@ -201,5 +272,14 @@ class PetController extends Controller
         $pet->delete();
 
         return redirect()->route('pets.index')->with('success', "Pet \"{$nomePet}\" excluído com sucesso.");
+    }
+
+    private function authorizePetAccess(Pet $pet): void
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'ADM' && (int) $pet->id_user !== (int) $user->id) {
+            abort(403);
+        }
     }
 }

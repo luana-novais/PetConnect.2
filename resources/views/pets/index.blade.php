@@ -128,7 +128,10 @@
                 <article class="pet-client-card">
                     @if($fotoPrincipal)
                         <img src="{{ asset('storage/' . $fotoPrincipal->url_foto) }}"
-                             alt="Foto de {{ $pet->nome }}" class="pet-client-avatar">
+                             alt="Foto de {{ $pet->nome }}"
+                             class="pet-client-avatar image-preview-trigger"
+                             tabindex="0" role="button" aria-haspopup="dialog"
+                             aria-label="Ampliar foto de {{ $pet->nome }}">
                     @else
                         <span class="pet-client-avatar pet-client-avatar-fallback">
                             {{ strtoupper(substr($pet->nome, 0, 1)) }}
@@ -199,7 +202,7 @@
                             <th>Nascimento</th>
                             <th>Peso</th>
                             <th>Sexo</th>
-                            <th style="width:130px;">Ações</th>
+                            <th class="pet-admin-actions-heading">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -211,7 +214,9 @@
                                     @if($fotoPrincipal)
                                         <img src="{{ asset('storage/' . $fotoPrincipal->url_foto) }}"
                                              alt="Foto de {{ $pet->nome }}"
-                                             class="pet-list-avatar">
+                                             class="pet-list-avatar image-preview-trigger"
+                                             tabindex="0" role="button" aria-haspopup="dialog"
+                                             aria-label="Ampliar foto de {{ $pet->nome }}">
                                     @else
                                         <span class="pet-list-avatar pet-list-avatar-fallback">
                                             {{ strtoupper(substr($pet->nome, 0, 1)) }}
@@ -225,9 +230,11 @@
                             <td>{{ $pet->data_nascimento ? $pet->data_nascimento->format('d/m/Y') : '—' }}</td>
                             <td>{{ $pet->peso ? number_format($pet->peso, 2, ',', '.') . ' kg' : '—' }}</td>
                             <td>{{ $pet->sexo === 'MACHO' ? '♂ Macho' : '♀ Fêmea' }}</td>
-                            <td class="d-flex gap-2">
-                                <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="{{ route('pets.show', $pet->id) }}" class="btn btn-sm btn-info">Consultar</a>
+                            <td class="pet-admin-actions-cell">
+                                <div class="pet-admin-actions">
+                                    <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{{ route('pets.show', $pet->id) }}" class="btn btn-sm btn-info">Consultar</a>
+                                </div>
                             </td>
                         </tr>
                         @endforeach

@@ -88,7 +88,7 @@
                                 Lembrar-me
                             </label>
                         </div>
-                        <a href="#">Esqueci a senha</a>
+                        <a href="{{ route('password.request') }}">Esqueci a senha</a>
                     </div>
 
                     {{-- Botão Login --}}

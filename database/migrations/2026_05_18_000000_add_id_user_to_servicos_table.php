@@ -11,8 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasColumn('servicos', 'id_user')) {
+            Schema::table('servicos', function (Blueprint $table) {
+                $table->foreignId('id_user')->nullable();
+            });
+        }
+
+        foreach (Schema::getForeignKeys('servicos') as $foreignKey) {
+            if ($foreignKey['columns'] === ['id_user']
+                && $foreignKey['foreign_table'] === 'users'
+                && $foreignKey['foreign_columns'] === ['id']) {
+                return;
+            }
+        }
+
         Schema::table('servicos', function (Blueprint $table) {
-            $table->foreignId('id_user')->nullable()->constrained('users', 'id')->onDelete('cascade');
+            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -21,8 +35,22 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasColumn('servicos', 'id_user')) {
+            return;
+        }
+
+        foreach (Schema::getForeignKeys('servicos') as $foreignKey) {
+            if ($foreignKey['columns'] === ['id_user']
+                && $foreignKey['foreign_table'] === 'users'
+                && $foreignKey['foreign_columns'] === ['id']) {
+                Schema::table('servicos', function (Blueprint $table) use ($foreignKey) {
+                    $table->dropForeign($foreignKey['name']);
+                });
+            }
+        }
+
         Schema::table('servicos', function (Blueprint $table) {
-            $table->dropForeignIdFor('users');
+            $table->dropColumn('id_user');
         });
     }
 };

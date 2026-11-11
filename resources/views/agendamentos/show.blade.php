@@ -295,7 +295,9 @@
                     <div class="col-6 col-md-3">
                         <img src="{{ asset('storage/' . $foto->url_foto) }}"
                              alt="{{ $foto->nome_arquivo }}"
-                             class="img-fluid rounded w-100"
+                             class="img-fluid rounded w-100 image-preview-trigger"
+                             tabindex="0" role="button" aria-haspopup="dialog"
+                             aria-label="Ampliar {{ $foto->nome_arquivo }}"
                              style="aspect-ratio: 1; object-fit: cover;">
                     </div>
                 @endforeach

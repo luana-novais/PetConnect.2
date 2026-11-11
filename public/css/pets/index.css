@@ -22,6 +22,24 @@
     justify-content: center;
 }
 
+.pet-admin-actions-heading,
+.pet-admin-actions-cell {
+    text-align: center;
+    width: 180px;
+}
+
+.pet-admin-actions {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.pet-admin-actions .btn {
+    min-width: 68px;
+}
+
 .pet-client-list {
     display: flex;
     flex-direction: column;

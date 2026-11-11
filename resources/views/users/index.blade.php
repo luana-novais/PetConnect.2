@@ -57,7 +57,10 @@
                                         <div class="user-list-name">
                                             @if($user->fotoUsuario)
                                                 <img src="{{ asset('storage/' . $user->fotoUsuario->url_foto) }}"
-                                                     alt="Foto de {{ $user->name }}" class="user-list-avatar">
+                                                     alt="Foto de {{ $user->name }}"
+                                                     class="user-list-avatar image-preview-trigger"
+                                                     tabindex="0" role="button" aria-haspopup="dialog"
+                                                     aria-label="Ampliar foto de {{ $user->name }}">
                                             @else
                                                 <span class="user-list-avatar user-list-avatar-fallback">
                                                     {{ strtoupper(substr($user->name, 0, 1)) }}
@@ -129,7 +132,9 @@
                         @if($user->fotoUsuario)
                             <img src="{{ asset('storage/' . $user->fotoUsuario->url_foto) }}"
                                  alt="Foto de {{ $user->name }}"
-                                 class="rounded-circle flex-shrink-0"
+                                 class="rounded-circle flex-shrink-0 image-preview-trigger"
+                                 tabindex="0" role="button" aria-haspopup="dialog"
+                                 aria-label="Ampliar foto de {{ $user->name }}"
                                  style="width:48px;height:48px;object-fit:cover;">
                         @else
                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"

@@ -202,6 +202,21 @@
         </div>
     </div>
 
+    <div class="modal fade image-preview-modal" id="imagePreviewModal" tabindex="-1"
+         aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span id="imagePreviewModalLabel" class="visually-hidden">Imagem ampliada</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="imagePreviewModalImage" class="image-preview-modal__image" src="" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -218,6 +233,39 @@
             sidebar.classList.toggle('collapsed');
             mainWrapper.classList.toggle('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        const imagePreviewModalElement = document.getElementById('imagePreviewModal');
+        const imagePreviewModalImage = document.getElementById('imagePreviewModalImage');
+
+        document.addEventListener('click', function (event) {
+            const target = event.target;
+            const image = target instanceof Element ? target.closest('.image-preview-trigger') : null;
+
+            if (!image || !imagePreviewModalElement) {
+                return;
+            }
+
+            imagePreviewModalImage.src = image.currentSrc || image.src;
+            imagePreviewModalImage.alt = image.alt;
+            bootstrap.Modal.getOrCreateInstance(imagePreviewModalElement).show();
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                const target = event.target;
+                const image = target instanceof Element ? target.closest('.image-preview-trigger') : null;
+
+                if (image) {
+                    event.preventDefault();
+                    image.click();
+                }
+            }
+        });
+
+        imagePreviewModalElement.addEventListener('hidden.bs.modal', function () {
+            imagePreviewModalImage.src = '';
+            imagePreviewModalImage.alt = '';
         });
     </script>
 

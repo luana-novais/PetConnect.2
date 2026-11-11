@@ -8,6 +8,7 @@ use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\DisponibilidadeController;
 use App\Http\Controllers\EspecieController;
 use App\Http\Controllers\RacaController;
@@ -19,12 +20,18 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login.store'
 Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.register');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 
 
 // Rotas protegidas (requerem autenticação)
 Route::middleware('auth')->group(function () {
 
     Route::resource('/pets', PetController::class);
+    Route::post('/pets/{pet}/fotos', [PetController::class, 'storePhotos'])->name('pets.photos.store');
+    Route::delete('/pets/{pet}/fotos/{foto}', [PetController::class, 'destroyPhoto'])->name('pets.photos.destroy');
     Route::resource('/servicos', ServicoController::class);
     Route::resource('/especies', EspecieController::class);
     Route::get('/racas/por-especie/{especieId}', [RacaController::class, 'porEspecie'])->name('racas.porEspecie');

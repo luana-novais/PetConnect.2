@@ -33,7 +33,10 @@
                 <div class="sitter-card-top">
                     @if($sitter->fotoUsuario)
                         <img src="{{ asset('storage/' . $sitter->fotoUsuario->url_foto) }}"
-                             alt="Foto de {{ $sitter->name }}" class="sitter-avatar">
+                             alt="Foto de {{ $sitter->name }}"
+                             class="sitter-avatar image-preview-trigger"
+                             tabindex="0" role="button" aria-haspopup="dialog"
+                             aria-label="Ampliar foto de {{ $sitter->name }}">
                     @else
                         <span class="sitter-avatar sitter-avatar-fallback">{{ strtoupper(substr($sitter->name, 0, 1)) }}</span>
                     @endif
