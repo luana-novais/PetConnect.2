@@ -1,0 +1,145 @@
+.racas-page {
+    margin: 0 auto;
+    max-width: 1440px;
+}
+
+.racas-page__header {
+    align-items: center;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.racas-page__title {
+    color: #1c1917;
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+}
+
+.racas-page__description {
+    color: #78716c;
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+.racas-page__add {
+    align-items: center;
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.5rem;
+    justify-content: center;
+    min-height: 42px;
+    padding-inline: 1rem;
+}
+
+.racas-filter-card {
+    border-radius: 14px;
+}
+
+.racas-filter-card .card-body {
+    padding: 1.25rem 1.5rem;
+}
+
+.racas-filter-form {
+    align-items: end;
+    display: flex;
+    gap: 1rem;
+}
+
+.racas-filter-field {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.racas-filter-field .form-label {
+    color: #44403c;
+    margin-bottom: 0.5rem;
+}
+
+.racas-filter-field .form-select {
+    min-height: 42px;
+}
+
+.racas-filter-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.racas-filter-actions .btn {
+    min-height: 42px;
+    padding-inline: 1rem;
+}
+
+.racas-table-card {
+    border-radius: 14px;
+}
+
+.racas-table thead th {
+    background: #fafaf9;
+    color: #57534e;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.9rem 1.1rem;
+    text-transform: uppercase;
+}
+
+.racas-table tbody td {
+    padding: 0.9rem 1.1rem;
+    vertical-align: middle;
+}
+
+.racas-actions-heading,
+.racas-actions-cell {
+    text-align: center;
+    width: 180px;
+}
+
+.racas-actions {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+    .racas-page__header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .racas-filter-card .card-body {
+        padding: 1rem;
+    }
+
+    .racas-filter-form {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0.85rem;
+    }
+
+    .racas-filter-actions {
+        width: 100%;
+    }
+
+    .racas-filter-actions .btn {
+        flex: 1 1 auto;
+    }
+
+    .racas-actions-heading,
+    .racas-actions-cell {
+        width: auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .racas-filter-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

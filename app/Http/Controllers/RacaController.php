@@ -21,10 +21,21 @@ class RacaController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $racas = Raca::with('especie')->get();
-        return view('racas.index', compact('racas'));
+        $filters = $request->validate([
+            'id_especie' => ['nullable', 'integer', 'exists:especie,id'],
+        ], [
+            'id_especie.exists' => 'A espécie selecionada não é válida.',
+        ]);
+
+        $selectedEspecie = $filters['id_especie'] ?? null;
+        $racas = Raca::with('especie')
+            ->when($selectedEspecie, fn ($query, $idEspecie) => $query->where('id_especie', $idEspecie))
+            ->get();
+        $especies = Especie::orderBy('tipo_pet')->get();
+
+        return view('racas.index', compact('racas', 'especies', 'selectedEspecie'));
     }
 
     public function create()
