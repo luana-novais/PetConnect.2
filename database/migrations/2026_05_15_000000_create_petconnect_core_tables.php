@@ -150,7 +150,6 @@ return new class extends Migration
             Schema::create('identificacao', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('id_user')->constrained('users')->cascadeOnDelete();
-                $table->foreignId('id_foto')->constrained('fotos')->cascadeOnDelete();
                 $table->enum('tipo_documento', ['CNPJ', 'CPF'])->default('CPF');
                 $table->string('documento', 18)->unique()->nullable();
                 $table->timestamps();

@@ -7,7 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ asset('app.css') }}" rel="stylesheet">
+    <link href="{{ asset('app.css') }}?v={{ filemtime(public_path('app.css')) }}" rel="stylesheet">
 
     @stack('styles')
 </head>
@@ -221,6 +221,7 @@
         });
     </script>
 
+    <script src="{{ asset('js/input-masks.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

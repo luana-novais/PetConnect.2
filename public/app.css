@@ -663,6 +663,11 @@ body {
     font-size: 0.92rem;
 }
 
+.table-card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 /* ── Botões ── */
 .btn-primary {
     background-color: var(--pet-primary);
@@ -724,6 +729,11 @@ body {
 .table td {
     vertical-align: middle;
     font-size: 0.92rem;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow: auto;
 }
 
 /* ── Form custom elements (Register) ── */

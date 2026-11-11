@@ -174,7 +174,9 @@
             default    => '🐾'
         };
 
-        $canEdit   = $ag->status === 'pendente';
+        $canEdit   = $ag->status === 'pendente'
+            && (auth()->user()->role === 'ADM'
+                || (auth()->user()->role === 'CLI' && $ag->id_user_cliente === auth()->id()));
         $canCancel = !in_array($ag->status, ['cancelado', 'concluido']);
         $canConfirm = auth()->user()->role === 'PRO' && $ag->status === 'pendente';
         $canComplete = auth()->user()->role === 'PRO'

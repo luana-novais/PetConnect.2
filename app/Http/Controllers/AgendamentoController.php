@@ -324,12 +324,13 @@ class AgendamentoController extends Controller
         }
 
         $user = auth()->user();
-        if (
-            $user->role !== 'ADM' &&
-            $agendamento->id_user_cliente !== $user->id &&
-            $agendamento->id_user_sitter  !== $user->id
-        ) {
+        if ($user->role !== 'ADM' && ($user->role !== 'CLI' || $agendamento->id_user_cliente !== $user->id)) {
             abort(403);
+        }
+
+        if ($user->role === 'CLI' && $agendamento->status !== Agendamento::STATUS_PENDENTE) {
+            return redirect()->route('agendamentos.show', $agendamento->id)
+                ->with('error', 'Somente agendamentos pendentes podem ser editados pelo cliente.');
         }
 
         // ADM vê todos; outros veem apenas o que é relevante para eles
@@ -358,12 +359,13 @@ class AgendamentoController extends Controller
         }
 
         $user = auth()->user();
-        if (
-            $user->role !== 'ADM' &&
-            $agendamento->id_user_cliente !== $user->id &&
-            $agendamento->id_user_sitter  !== $user->id
-        ) {
+        if ($user->role !== 'ADM' && ($user->role !== 'CLI' || $agendamento->id_user_cliente !== $user->id)) {
             abort(403);
+        }
+
+        if ($user->role === 'CLI' && $agendamento->status !== Agendamento::STATUS_PENDENTE) {
+            return redirect()->route('agendamentos.show', $agendamento->id)
+                ->with('error', 'Somente agendamentos pendentes podem ser editados pelo cliente.');
         }
 
         $request->validate([

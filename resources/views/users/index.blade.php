@@ -24,7 +24,7 @@
         </a>
     </div>
 
-    <div class="card">
+    <div class="card table-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span><i class="bi bi-people me-2 text-warning"></i>Usuários Cadastrados</span>
             <span class="badge bg-light text-secondary border">{{ $users->count() }} registros</span>
@@ -45,6 +45,7 @@
                             <tr>
                                 <th>Usuário</th>
                                 <th>Perfil</th>
+                                <th>Documento</th>
                                 <th>Telefone</th>
                                 <th>Ações</th>
                             </tr>
@@ -73,14 +74,23 @@
                                             {{ $user->role === 'ADM' ? 'Administrador' : ($user->role === 'PRO' ? 'Profissional' : 'Cliente') }}
                                         </span>
                                     </td>
+                                    <td>
+                                        @if($user->identificacao)
+                                            {{ $user->identificacao->tipo_documento }}: {{ $user->identificacao->documento }}
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
                                     <td>{{ $user->telefone->numero ?? '—' }}</td>
-                                    <td class="d-flex gap-2">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
-                                        </form>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="m-0" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -141,6 +151,16 @@
                         <div class="col-md-6">
                             <div class="text-muted mb-1" style="font-size:.78rem;">Email</div>
                             <div class="fw-semibold">{{ $user->email }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-muted mb-1" style="font-size:.78rem;">Documento</div>
+                            <div class="fw-semibold">
+                                @if($user->identificacao)
+                                    {{ $user->identificacao->tipo_documento }}: {{ $user->identificacao->documento }}
+                                @else
+                                    Não informado
+                                @endif
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="text-muted mb-1" style="font-size:.78rem;">Tipo de Conta</div>

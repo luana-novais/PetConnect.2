@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Identificacao;
 use App\Models\Telefone;
 use App\Models\Endereco;
 use Illuminate\Http\Request;
@@ -65,11 +66,17 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $documento = preg_replace('/\D+/', '', (string) $request->input('documento', ''));
+        $request->merge(['documento' => $documento]);
+        $documentoLength = $request->input('tipo_documento') === 'CNPJ' ? 14 : 11;
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
             'role'     => 'required|in:CLI,PRO',
+            'tipo_documento' => 'required|in:CPF,CNPJ',
+            'documento' => ['required', 'digits:' . $documentoLength, 'unique:identificacao,documento'],
             'numero'     => 'nullable|string|max:20',
             'endereco'   => 'nullable|string|max:255',
             'complemento' => 'nullable|string|max:255',
@@ -86,6 +93,11 @@ class AuthController extends Controller
             'password.min'       => 'A senha deve ter pelo menos 6 caracteres.',
             'password.confirmed' => 'As senhas não correspondem.',
             'role.required'      => 'Selecione um tipo de usuário.',
+            'tipo_documento.required' => 'Selecione CPF ou CNPJ.',
+            'tipo_documento.in' => 'Selecione CPF ou CNPJ.',
+            'documento.required' => 'Informe o CPF ou CNPJ.',
+            'documento.digits' => 'O documento deve conter a quantidade de números correspondente ao tipo selecionado.',
+            'documento.unique' => 'Este CPF ou CNPJ já está cadastrado.',
             'foto.mimes'         => 'A foto deve estar nos formatos JPG ou PNG.',
         ]);
 
@@ -94,6 +106,12 @@ class AuthController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
+        ]);
+
+        Identificacao::create([
+            'id_user' => $user->id,
+            'tipo_documento' => $request->tipo_documento,
+            'documento' => $documento,
         ]);
 
         if ($request->filled('numero')) {

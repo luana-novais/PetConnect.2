@@ -186,7 +186,7 @@
         @endif
 
         {{-- Histórico de agendamentos --}}
-        <div class="card pet-detail-card">
+        <div class="card pet-detail-card table-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-calendar3 me-2 text-warning"></i>Últimos Agendamentos</span>
                 <span class="badge bg-light text-secondary border">{{ $pet->agendamentos->count() }}</span>

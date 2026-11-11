@@ -76,6 +76,26 @@
                             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
+                            <label for="documento_edit" class="form-label" style="font-size:.78rem;">CPF/CNPJ</label>
+                            <div class="input-group">
+                                <select id="tipo_documento_edit"
+                                        class="form-select flex-grow-0 flex-shrink-0"
+                                        style="width: max-content;"
+                                        aria-label="Tipo de documento" disabled>
+                                    @if(!$user->identificacao)
+                                        <option value="" selected>—</option>
+                                    @endif
+                                    <option value="CPF" @selected($user->identificacao?->tipo_documento === 'CPF')>CPF</option>
+                                    <option value="CNPJ" @selected($user->identificacao?->tipo_documento === 'CNPJ')>CNPJ</option>
+                                </select>
+                                <input type="text" id="documento_edit"
+                                       data-mask="document" data-document-type="tipo_documento_edit"
+                                       class="form-control" inputmode="numeric" maxlength="18"
+                                       value="{{ $user->identificacao?->documento }}"
+                                       placeholder="Não informado" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label" style="font-size:.78rem;" for="foto">Foto do usuário</label>
                             <input type="file" name="foto" id="foto" accept="image/jpeg,image/png"
                                    class="form-control @error('foto') is-invalid @enderror">
@@ -97,7 +117,7 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label" style="font-size:.78rem;">Número</label>
-                <input type="text" name="numero"
+                <input type="text" name="numero" data-mask="phone" inputmode="tel" maxlength="15"
                        class="form-control @error('numero') is-invalid @enderror"
                        value="{{ old('numero', $telefone?->numero) }}"
                        placeholder="(00) 00000-0000">
@@ -117,7 +137,7 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label" style="font-size:.78rem;">CEP</label>
-                <input type="text" name="cep"
+                <input type="text" name="cep" data-mask="cep" inputmode="numeric" maxlength="9"
                        class="form-control @error('cep') is-invalid @enderror"
                        value="{{ old('cep', $endereco?->cep) }}"
                        placeholder="00000-000">

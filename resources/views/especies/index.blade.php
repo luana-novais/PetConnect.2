@@ -19,7 +19,7 @@
     </a>
 </div>
 
-<div class="card">
+<div class="card table-card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-list-ul me-2 text-warning"></i>Espécies Cadastradas</span>
         <span class="badge bg-light text-secondary border">{{ $especies->count() }} registros</span>

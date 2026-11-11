@@ -91,7 +91,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="numero" class="form-label">Telefone</label>
-                        <input type="text" class="form-control @error('numero') is-invalid @enderror" id="numero" name="numero" value="{{ old('numero') }}" placeholder="(11) 98765-4321">
+                        <input type="text" class="form-control @error('numero') is-invalid @enderror" id="numero" name="numero" data-mask="phone" inputmode="tel" maxlength="15" value="{{ old('numero') }}" placeholder="(11) 98765-4321">
                         @error('numero')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -147,7 +147,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="cep" class="form-label">CEP</label>
-                        <input type="text" class="form-control @error('cep') is-invalid @enderror" id="cep" name="cep" value="{{ old('cep') }}" placeholder="12345-678">
+                        <input type="text" class="form-control @error('cep') is-invalid @enderror" id="cep" name="cep" data-mask="cep" inputmode="numeric" maxlength="9" value="{{ old('cep') }}" placeholder="12345-678">
                         @error('cep')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

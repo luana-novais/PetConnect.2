@@ -17,11 +17,11 @@ class UserController extends Controller
     public function index()
     {
         if (auth()->user()->role === 'ADM') {
-            $users = User::with(['telefone', 'endereco', 'fotoUsuario'])->get();
+            $users = User::with(['telefone', 'endereco', 'fotoUsuario', 'identificacao'])->get();
         } else {
             // Não-ADM vê apenas o próprio perfil; envolve em coleção
             // para que a view use sempre $users com @foreach
-            $users = User::with(['telefone', 'endereco', 'fotoUsuario'])
+            $users = User::with(['telefone', 'endereco', 'fotoUsuario', 'identificacao'])
                 ->where('id', auth()->id())
                 ->get();
         }
@@ -108,7 +108,7 @@ class UserController extends Controller
             abort(403);
         }
 
-        $user     = User::with(['telefone', 'endereco'])->findOrFail($id);
+        $user     = User::with(['telefone', 'endereco', 'identificacao'])->findOrFail($id);
         $telefone = $user->telefone;
         $endereco = $user->endereco;
 
@@ -123,7 +123,7 @@ class UserController extends Controller
             abort(403);
         }
 
-        $user     = User::findOrFail($id);
+        $user     = User::with('identificacao')->findOrFail($id);
         $telefone = Telefone::where('id_user', $id)->first();
         $endereco = Endereco::where('id_user', $id)->first();
 

@@ -26,21 +26,33 @@
 {{-- Filtros --}}
 <div class="card mb-4">
     <div class="card-body py-3">
-        <form action="{{ route('pets.index') }}" method="GET" class="row g-2 align-items-end">
-            <div class="col-md-4">
+        <form action="{{ route('pets.index') }}" method="GET" class="row g-2 align-items-end" id="pet-filters" data-breed-url="{{ url('/racas/por-especie') }}">
+            <div class="col-md-3">
                 <label class="form-label mb-1">Buscar por nome</label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" name="nome" class="form-control" placeholder="Nome do pet..." value="{{ request('nome') }}">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label mb-1">Espécie</label>
-                <select name="id_especie" class="form-select form-select-sm">
+                <select name="id_especie" id="filter-id-especie" class="form-select form-select-sm">
                     <option value="">Todas</option>
                     @foreach($especies as $e)
                         <option value="{{ $e->id }}" {{ request('id_especie') == $e->id ? 'selected' : '' }}>
                             {{ $e->tipo_pet }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1">Raça</label>
+                <select name="id_raca" id="filter-id-raca" class="form-select form-select-sm"
+                        @disabled(!$selectedEspecie)>
+                    <option value="">Todas</option>
+                    @foreach($racas as $raca)
+                        <option value="{{ $raca->id }}" {{ request('id_raca') == $raca->id ? 'selected' : '' }}>
+                            {{ $raca->nome }}
                         </option>
                     @endforeach
                 </select>
@@ -64,6 +76,41 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const filterSpecies = document.getElementById('filter-id-especie');
+    const filterBreed = document.getElementById('filter-id-raca');
+    const breedUrl = document.getElementById('pet-filters').dataset.breedUrl;
+
+    filterSpecies.addEventListener('change', () => {
+        filterBreed.innerHTML = '<option value="">Todas</option>';
+        filterBreed.disabled = true;
+
+        if (!filterSpecies.value) return;
+
+        fetch(`${breedUrl}/${encodeURIComponent(filterSpecies.value)}`, {
+            headers: { Accept: 'application/json' },
+        })
+            .then((response) => {
+                if (!response.ok) throw new Error('Falha ao carregar raças');
+                return response.json();
+            })
+            .then((racas) => {
+                racas.forEach((raca) => {
+                    const option = document.createElement('option');
+                    option.value = raca.id;
+                    option.textContent = raca.nome;
+                    filterBreed.appendChild(option);
+                });
+                filterBreed.disabled = false;
+            })
+            .catch(() => {
+                filterBreed.innerHTML = '<option value="">Erro ao carregar raças</option>';
+            });
+    });
+</script>
+@endpush
 
 @if(auth()->user()->role === 'CLI')
     @if($pets->isEmpty())
@@ -127,7 +174,7 @@
     @endif
 @else
 {{-- Tabela administrativa --}}
-<div class="card">
+<div class="card table-card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-heart me-2 text-warning"></i>Pets Cadastrados</span>
         <span class="badge bg-light text-secondary border">{{ $pets->total() }} registros</span>

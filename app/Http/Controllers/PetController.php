@@ -16,20 +16,35 @@ class PetController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $filters = $request->validate([
+            'nome' => 'nullable|string|max:255',
+            'id_especie' => 'nullable|integer|exists:especie,id',
+            'id_raca' => 'nullable|integer|exists:raca,id',
+            'sexo' => 'nullable|in:MACHO,FEMEA',
+        ]);
 
-        if ($user->role === 'ADM') {
-            $pets = Pet::with(['especie', 'raca', 'user', 'fotos', 'foto'])->paginate(10);
-        } else {
+        $user = auth()->user();
+        $query = Pet::with(['especie', 'raca', 'user', 'fotos', 'foto']);
+
+        if ($user->role !== 'ADM') {
             // CLI vê apenas os próprios pets
-            $pets = Pet::with(['especie', 'raca', 'user', 'fotos', 'foto'])
-                ->where('id_user', $user->id)
-                ->paginate(10);
+            $query->where('id_user', $user->id);
         }
 
-        $especies = Especie::all();
+        $query
+            ->when($filters['nome'] ?? null, fn ($query, $nome) => $query->where('nome', 'like', '%' . trim($nome) . '%'))
+            ->when($filters['id_especie'] ?? null, fn ($query, $especieId) => $query->where('id_especie', $especieId))
+            ->when($filters['id_raca'] ?? null, fn ($query, $racaId) => $query->where('id_raca', $racaId))
+            ->when($filters['sexo'] ?? null, fn ($query, $sexo) => $query->where('sexo', $sexo));
 
-        return view('pets.index', compact('pets', 'especies'));
+        $pets = $query->paginate(10)->withQueryString();
+        $especies = Especie::all();
+        $selectedEspecie = $filters['id_especie'] ?? null;
+        $racas = $selectedEspecie
+            ? Raca::where('id_especie', $selectedEspecie)->orderBy('nome')->get()
+            : collect();
+
+        return view('pets.index', compact('pets', 'especies', 'racas', 'selectedEspecie'));
     }
 
     public function create(Request $request)

@@ -53,7 +53,7 @@
         <p class="text-muted mb-0" style="font-size:0.88rem;">Informações do agendamento do pet {{ $agendamento->pet->nome }}.</p>
     </div>
     <div class="d-flex gap-2">
-        @if($agendamento->status !== 'concluido')
+        @if(auth()->user()->role === 'ADM' && $agendamento->status !== 'concluido')
             <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-pencil me-1"></i> Editar
             </a>
@@ -247,7 +247,9 @@
                         </div>
                     @endif
 
-                    @if($agendamento->status === 'pendente' && auth()->user()->role !== 'PRO')
+                    @if(auth()->user()->role === 'CLI'
+                        && $agendamento->id_user_cliente === auth()->id()
+                        && $agendamento->status === 'pendente')
                         <a href="{{ route('agendamentos.edit', $agendamento->id) }}" class="btn btn-warning">
                             <i class="bi bi-pencil me-1"></i> Editar
                         </a>

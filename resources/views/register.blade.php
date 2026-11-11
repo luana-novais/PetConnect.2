@@ -116,6 +116,27 @@
                         @error('role')<div class="invalid-feedback d-block mt-2">{{ $message }}</div>@enderror
                     </div>
 
+                    <div class="form-group">
+                        <label for="documento" class="form-label">CPF/CNPJ</label>
+                        <div class="input-group">
+                            <select id="tipo_documento" name="tipo_documento"
+                                    class="form-select flex-grow-0 flex-shrink-0 @error('tipo_documento') is-invalid @enderror"
+                                    style="width: max-content;"
+                                    aria-label="Tipo de documento" required>
+                                <option value="CPF" @selected(old('tipo_documento', 'CPF') === 'CPF')>CPF</option>
+                                <option value="CNPJ" @selected(old('tipo_documento') === 'CNPJ')>CNPJ</option>
+                            </select>
+                            <input type="text" id="documento" name="documento" inputmode="numeric"
+                                data-mask="document" data-document-type="tipo_documento"
+                                maxlength="18" autocomplete="off"
+                                   class="form-control @error('documento') is-invalid @enderror"
+                                   placeholder="Digite o número"
+                                   value="{{ old('documento') }}" required>
+                        </div>
+                        @error('tipo_documento')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                        @error('documento')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                    </div>
+
                     <div class="row g-2">
                         <div class="col-6">
                             <div class="form-group mb-0">
@@ -155,6 +176,7 @@
                             <i class="bi bi-telephone me-1"></i>Telefone
                         </label>
                         <input type="text" id="numero" name="numero"
+                               data-mask="phone" inputmode="tel" maxlength="15"
                                class="form-control @error('numero') is-invalid @enderror"
                                placeholder="(11) 99999-9999"
                                value="{{ old('numero') }}">
@@ -219,6 +241,7 @@
                             <div class="form-group mb-0">
                                 <label for="cep" class="form-label">CEP</label>
                                 <input type="text" id="cep" name="cep"
+                                        data-mask="cep" inputmode="numeric" maxlength="9"
                                        class="form-control @error('cep') is-invalid @enderror"
                                        placeholder="00000-000"
                                        value="{{ old('cep') }}">
@@ -243,5 +266,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/input-masks.js') }}"></script>
 </body>
 </html>

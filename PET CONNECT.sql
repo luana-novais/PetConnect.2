@@ -19,7 +19,6 @@ CREATE TABLE users (
 CREATE TABLE identificacao (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_user BIGINT UNSIGNED NOT NULL,
-    id_foto BIGINT UNSIGNED NOT NULL,
     tipo_documento ENUM('CNPJ','CPF') NOT NULL DEFAULT 'CPF',
     documento VARCHAR(18) UNIQUE,
     created_at TIMESTAMP NULL,
@@ -27,10 +26,6 @@ CREATE TABLE identificacao (
 
     CONSTRAINT fk_identificacao_user
         FOREIGN KEY (id_user) REFERENCES users(id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-        
-	CONSTRAINT fk_id_fotos
-        FOREIGN KEY (id_foto) REFERENCES fotos(id)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 

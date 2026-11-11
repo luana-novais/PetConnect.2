@@ -639,7 +639,7 @@
     <!-- Últimos Agendamentos -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm table-card">
                 <div class="card-header bg-white border-0 p-3">
                     <h6 class="mb-0">Últimos Agendamentos</h6>
                 </div>
